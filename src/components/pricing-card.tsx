@@ -46,10 +46,18 @@ export default function PricingCard({
   };
 
   // Determine border style based on plan
-  const getBorderStyle = () => {
+  const getPricingCardBorderStyle = () => {
     if (item.product_name === "Studio") return "border-2 border-orange-500";
     if (item.product_name === "Pro") return "border-2 border-purple-500";
     return "border border-gray-200";
+  };
+
+  const getPricingCardButtonStyle = () => {
+    if (item.product_name === "Studio")
+      return "bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 text-white hover:opacity-70";
+    if (item.product_name === "Pro")
+      return "bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 text-white hover:opacity-70";
+    return "bg-black hover:bg-black/70";
   };
 
   // Handle checkout process
@@ -92,7 +100,7 @@ export default function PricingCard({
 
   return (
     <Card
-      className={`w-[350px] relative overflow-hidden ${item.popular ? "border-2 border-blue-500 shadow-xl scale-105" : "border border-gray-200"} ${getBorderStyle()}`}
+      className={`w-[350px] relative overflow-hidden ${item.popular ? "border-2 border-blue-500 shadow-xl scale-105" : "border border-gray-200"} ${getPricingCardBorderStyle()}`}
     >
       {item.popular && (
         <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-purple-50 opacity-30" />
@@ -138,7 +146,7 @@ export default function PricingCard({
           onClick={async () => {
             await handleCheckout(item.id);
           }}
-          className={`w-full py-6 text-lg font-medium`}
+          className={`w-full py-6 text-lg font-medium ${getPricingCardButtonStyle()}`}
         >
           Get Started
         </Button>
