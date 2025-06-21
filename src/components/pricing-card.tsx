@@ -21,12 +21,36 @@ export default function PricingCard({
   user: User | null;
 }) {
   // Default features for all plans
-  const features = [
-    "Connect 1 inbox (Gmail, Outlook, etc.)",
-    "Auto-organize brand deal emails (filters & labels)",
-    "Basic brand deal tracking (status: new, responded, completed)",
-    "5 active deals at a time",
-  ];
+  const features: Record<string, string[]> = {
+    price_1OSrPUFQRFibPDrOJoWhFhOq: [
+      // starter
+      "Connect 1 inbox (Gmail, Outlook, etc.)",
+      "Auto-organize brand deal emails (filters & labels)",
+      "Brand deal tracking (status: new, responded, completed)",
+      "5 active deals at a time",
+    ],
+    price_1RcHTXFQRFibPDrOf9N91VcP: [
+      // pro
+      "Connect 3 inboxes (Gmail, Outlook, etc.)",
+      "Auto-organize brand deal emails (filters & labels)",
+      "Brand deal tracking (status: new, responded, completed)",
+      "30 active deals at a time",
+    ],
+    price_1RcHUyFQRFibPDrOFxEMiEbp: [
+      // studio
+      "Unlimited inbox Connections (Gmail, Outlook, etc.)",
+      "Auto-organize brand deal emails (filters & labels)",
+      "Brand deal tracking (status: new, responded, completed)",
+      "Unlimited active deals at a time",
+    ],
+  };
+
+  // Determine border style based on plan
+  const getBorderStyle = () => {
+    if (item.product_name === "Studio") return "border-2 border-orange-500";
+    if (item.product_name === "Pro") return "border-2 border-purple-500";
+    return "border border-gray-200";
+  };
 
   // Handle checkout process
   const handleCheckout = async (priceId: string) => {
@@ -68,7 +92,7 @@ export default function PricingCard({
 
   return (
     <Card
-      className={`w-[350px] relative overflow-hidden ${item.popular ? "border-2 border-blue-500 shadow-xl scale-105" : "border border-gray-200"}`}
+      className={`w-[350px] relative overflow-hidden ${item.popular ? "border-2 border-blue-500 shadow-xl scale-105" : "border border-gray-200"} ${getBorderStyle()}`}
     >
       {item.popular && (
         <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-purple-50 opacity-30" />
@@ -80,7 +104,17 @@ export default function PricingCard({
           </div>
         )}
         <CardTitle className="text-2xl font-bold tracking-tight text-gray-900">
-          {item.name}
+          <span
+            className={
+              item.product_name === "Studio"
+                ? "bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 bg-clip-text text-transparent font-extrabold"
+                : item.product_name === "Pro"
+                  ? "bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 bg-clip-text text-transparent font-extrabold"
+                  : "text-gray-900"
+            }
+          >
+            {item.product_name || item.name}
+          </span>
         </CardTitle>
         <CardDescription className="flex items-baseline gap-2 mt-2">
           <span className="text-4xl font-bold text-gray-900">
@@ -91,7 +125,7 @@ export default function PricingCard({
       </CardHeader>
       <CardContent className="relative">
         <ul className="space-y-3">
-          {features.map((feature, index) => (
+          {features[item.id].map((feature, index) => (
             <li key={index} className="flex items-start gap-3">
               <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
               <span className="text-gray-700">{feature}</span>

@@ -15,6 +15,8 @@ export default async function Home() {
     "supabase-functions-get-plans",
   );
 
+  console.log("Plans fetched from Supabase:", plans);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
       <Navbar />
@@ -146,16 +148,18 @@ export default async function Home() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold mb-4">
-              Simple, Transparent Pricing
+              No Fluff. Just Features You'll Use.
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
-              Choose the perfect plan for your needs. No hidden fees.
+              Choose the perfect plan.
             </p>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {plans?.map((item: any) => (
-              <PricingCard key={item.id} item={item} user={user} />
-            ))}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-16 max-w-6xl mx-auto">
+            {plans
+              ?.sort((a: any, b: any) => a.amount - b.amount)
+              .map((item: any) => (
+                <PricingCard key={item.id} item={item} user={user} />
+              ))}
           </div>
         </div>
       </section>
