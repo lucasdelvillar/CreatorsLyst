@@ -12,9 +12,9 @@ export default async function Navbar() {
   } = await (await supabase).auth.getUser();
 
   return (
-    <nav className="w-full border-b border-gray-200 bg-white py-2">
+    <nav className="w-full border-b border-gray-200 py-2 bg-[#ece6e8]">
       <div className="container mx-auto px-4 flex justify-between items-center">
-        <Link href="/" prefetch className="text-xl font-bold text-blue-600">
+        <Link href="/" prefetch className="text-xl font-bold text-black">
           CreatorsLyst
         </Link>
         <div className="flex gap-4 items-center">

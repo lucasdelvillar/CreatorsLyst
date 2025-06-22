@@ -18,12 +18,58 @@ export default async function Home() {
   console.log("Plans fetched from Supabase:", plans);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
+    <div className="min-h-screen">
       <Navbar />
       <Hero />
 
+      {/* How It Works Section */}
+      <section className="py-20 bg-[#ece6e8]">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16 flex flex-col">
+            <h2 className="text-3xl font-bold">Brand deals done</h2>
+            <h2 className="text-3xl font-bold mb-4">the influencer way</h2>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl font-bold text-blue-600">1</span>
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Connect Your Email</h3>
+              <p className="text-gray-600">
+                Securely link your Gmail or Outlook account with just a few
+                clicks.
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl font-bold text-blue-600">2</span>
+              </div>
+              <h3 className="text-xl font-semibold mb-2">
+                AI Scans & Organizes
+              </h3>
+              <p className="text-gray-600">
+                Our smart system identifies and categorizes brand deal
+                opportunities.
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl font-bold text-blue-600">3</span>
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Manage & Track</h3>
+              <p className="text-gray-600">
+                View, respond to, and track all your deals from one dashboard.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Features Section */}
-      <section className="py-24 bg-white">
+      <section className="py-24 bg-[#ece6e8]">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold mb-4">
@@ -74,81 +120,13 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* How It Works Section */}
-      <section className="py-20 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">How It Works</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              Get started in minutes and transform your brand deal management
-              workflow.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-blue-600">1</span>
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Connect Your Email</h3>
-              <p className="text-gray-600">
-                Securely link your Gmail or Outlook account with just a few
-                clicks.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-blue-600">2</span>
-              </div>
-              <h3 className="text-xl font-semibold mb-2">
-                AI Scans & Organizes
-              </h3>
-              <p className="text-gray-600">
-                Our smart system identifies and categorizes brand deal
-                opportunities.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-blue-600">3</span>
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Manage & Track</h3>
-              <p className="text-gray-600">
-                View, respond to, and track all your deals from one dashboard.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="py-20 bg-blue-600 text-white">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-3 gap-8 text-center">
-            <div>
-              <div className="text-4xl font-bold mb-2">10,000+</div>
-              <div className="text-blue-100">Deals Organized</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold mb-2">95%</div>
-              <div className="text-blue-100">Response Rate Increase</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold mb-2">$2.5M+</div>
-              <div className="text-blue-100">Total Deal Value Tracked</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Pricing Section */}
-      <section className="py-24 bg-white" id="pricing">
+      <section className="py-24 bg-[#ece6e8]" id="pricing">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">
-              No Fluff. Just Features You'll Use.
+            <h2 className="text-3xl font-bold mb-4 flex flex-col">
+              <span className=""> No Fluff, </span>
+              <span> Just Features You&apos;ll use </span>
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
               Choose the perfect plan.
@@ -165,7 +143,7 @@ export default async function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-[#ece6e8]">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">
             Ready to Organize Your Brand Deals?
