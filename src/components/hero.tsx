@@ -3,11 +3,11 @@ import { ArrowUpRight, Check, Mail, Inbox, TrendingUp } from "lucide-react";
 
 export default function Hero() {
   return (
-    <div className="relative overflow-hidden bg-[#ece6e8]">
+    <div className="relative overflow-hidden bg-white">
       {/* Background gradient */}
       <div className="absolute inset-0" />
 
-      <div className="relative pt-4 pb-4 sm:pt-4 sm:pb-4">
+      <div className="relative pt-16 pb-4 sm:pt-16 sm:pb-4">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-4xl mx-auto">
             <div className="flex justify-center mb-8">
@@ -42,7 +42,7 @@ export default function Hero() {
 
               <Link
                 href="#pricing"
-                className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 text-white rounded-lg hover:opacity-70 transition-colors text-lg font-medium"
+                className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 text-white rounded-lg hover:brightness-95 transition-colors text-lg font-medium"
               >
                 View Pricing
               </Link>

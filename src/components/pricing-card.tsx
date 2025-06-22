@@ -54,9 +54,9 @@ export default function PricingCard({
 
   const getPricingCardButtonStyle = () => {
     if (item.product_name === "Studio")
-      return "bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 text-white hover:opacity-70";
+      return "bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 text-white hover:brightness-90";
     if (item.product_name === "Pro")
-      return "bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 text-white hover:opacity-70";
+      return "bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 text-white hover:brightness-90";
     return "bg-black hover:bg-black/70";
   };
 
