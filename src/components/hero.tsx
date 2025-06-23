@@ -27,8 +27,8 @@ export default function Hero() {
 
             <p className="text-xl text-gray-600 mb-12 max-w-2xl mx-auto leading-relaxed">
               Automatically organize and manage brand collaboration
-              opportunities from your inbox. Turn chaos into opportunity with
-              smart email categorization and deal tracking.
+              opportunities from your inbox or DMs. Turn chaos into opportunity
+              with smart categorization and deal tracking.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -51,7 +51,7 @@ export default function Hero() {
             <div className="mt-16 flex flex-col sm:flex-row items-center justify-center gap-8 text-sm text-gray-600">
               <div className="flex items-center gap-2">
                 <Check className="w-5 h-5 text-green-500" />
-                <span>Gmail & Outlook integration</span>
+                <span>Email & DM integration</span>
               </div>
               <div className="flex items-center gap-2">
                 <Check className="w-5 h-5 text-green-500" />

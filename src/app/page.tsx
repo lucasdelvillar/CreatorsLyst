@@ -27,7 +27,7 @@ export default async function Home() {
       <Features />
 
       {/* Pricing Section */}
-      <section className="py-24 bg-[#fffcfdb3]" id="pricing">
+      <section className="py-24 bg-white" id="pricing">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold mb-4 flex flex-col">
@@ -49,7 +49,7 @@ export default async function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-[#fffcfdb3]">
+      <section className="py-20 bg-white">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">
             Ready to Organize Your Brand Deals?

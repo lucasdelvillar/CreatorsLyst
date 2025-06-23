@@ -30,11 +30,11 @@ export default function Steps() {
           ].map((item, index) => {
             const backgroundImage =
               index === 0
-                ? "url('https://cdn.dribbble.com/userupload/37229536/file/original-1bfece9cc604e2fd6d8b4f50b46d7888.jpg?resize=752x&vertical=center')"
+                ? "url('/images/connect.jpg')"
                 : index === 1
-                  ? "url('https://cdn.dribbble.com/userupload/32367594/file/original-ad32e4b392c5433f40db0944a8cf87c3.jpg?resize=752x&vertical=center')"
+                  ? "url('/images/organize.jpg')"
                   : index === 2
-                    ? "url('https://cdn.dribbble.com/userupload/37231561/file/original-b1446d9e22acf9dcb570b17cd8be7b6e.jpg?resize=752x&vertical=center')"
+                    ? "url('/images/track.jpg')"
                     : "";
 
             const isImageCard = index <= 2;
@@ -44,7 +44,7 @@ export default function Steps() {
               <div
                 key={index}
                 className={`
-          relative w-[355px] h-[440px] flex flex-col justify-between rounded-xl border border-purple-500 shadow-sm hover:shadow-md transition-shadow text-left hover:scale-[1.03] hover:-translate-y-1 transition-transform duration-300 ease-out
+          relative w-[355px] h-[440px] flex flex-col justify-between rounded-xl shadow-sm hover:shadow-md transition-shadow text-left hover:scale-[1.03] hover:-translate-y-1 transition-transform duration-300 ease-out
           ${isImageCard ? "text-white bg-cover bg-center" : "bg-white"}
         `}
                 style={isImageCard ? { backgroundImage } : {}}
