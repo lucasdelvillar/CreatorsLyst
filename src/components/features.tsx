@@ -1,4 +1,16 @@
-import { ArrowUpRight, CheckCircle2, Zap, Shield, Users } from "lucide-react";
+import {
+  ScanEye,
+  Glasses,
+  Zap,
+  ShieldCheck,
+  Fingerprint,
+  EyeOff,
+  Drama,
+  Users,
+  AudioWaveform,
+  AlarmClockCheck,
+  TextSelect,
+} from "lucide-react";
 
 export default function Features() {
   return (
@@ -21,27 +33,56 @@ export default function Features() {
               icon: <Zap className="w-8 h-8" />,
               title: "Smart Scanning",
               description: [
-                "Automatically identifies brand deals from your inbox or DMs",
-                "Pulls out the important details, like brand name and payment",
-                "No more digging through cluttered inboxes",
+                {
+                  text: "Automatically identifies brand deals from your inbox or DMs",
+                  icon: <Glasses className="w-5 h-5 text-purple-500 mt-1" />,
+                },
+                {
+                  text: "Pulls out the important details, like brand name and payment",
+                  icon: <ScanEye className="w-5 h-5 text-purple-500 mt-1" />,
+                },
               ],
             },
             {
-              icon: <Shield className="w-8 h-8" />,
+              icon: <ShieldCheck className="w-8 h-8" />,
               title: "Secure Integration",
               description: [
-                "No passwords shared — just simple, secure logins",
-                "Your info stays private and protected at all times",
-                "You choose what to connect and what to keep separate",
+                {
+                  text: "No passwords shared — just simple, secure logins",
+                  icon: (
+                    <Fingerprint className="w-5 h-5 text-purple-500 mt-1" />
+                  ),
+                },
+                {
+                  text: "Your info stays private and protected at all times",
+                  icon: <EyeOff className="w-5 h-5 text-purple-500 mt-1" />,
+                },
+                {
+                  text: "You choose what to connect and what to keep separate",
+                  icon: <Drama className="w-5 h-5 text-purple-500 mt-1" />,
+                },
               ],
             },
             {
               icon: <Users className="w-8 h-8" />,
               title: "Deal Dashboard",
               description: [
-                "Track deal status — from first message to final payment",
-                "Stay on top of deadlines and deliverables",
-                "No more messy spreadsheets or lost emails",
+                {
+                  text: "Track deal status — from first message to final payment",
+                  icon: (
+                    <AudioWaveform className="w-5 h-5 text-purple-500 mt-1" />
+                  ),
+                },
+                {
+                  text: "Stay on top of deadlines and deliverables",
+                  icon: (
+                    <AlarmClockCheck className="w-5 h-5 text-purple-500 mt-1" />
+                  ),
+                },
+                {
+                  text: "No more messy spreadsheets or lost emails",
+                  icon: <TextSelect className="w-5 h-5 text-purple-500 mt-1" />,
+                },
               ],
             },
           ].map((feature, index) => {
@@ -61,15 +102,14 @@ export default function Features() {
                   <h3 className="text-2xl font-semibold mb-4">
                     {feature.title}
                   </h3>
-                  <p className="text-gray-600 text-lg leading-relaxed">
-                    {feature.description[0]}
-                  </p>
-                  <p className="text-gray-600 text-lg leading-relaxed">
-                    {feature.description[1]}
-                  </p>
-                  <p className="text-gray-600 text-lg leading-relaxed">
-                    {feature.description[2]}
-                  </p>
+                  {feature.description.map((line, i) => (
+                    <div key={i} className="flex items-start gap-2 mb-2">
+                      {line.icon}
+                      <p className="text-gray-600 text-lg leading-relaxed">
+                        {line.text}
+                      </p>
+                    </div>
+                  ))}
                 </div>
               </div>
             );
