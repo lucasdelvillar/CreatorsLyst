@@ -51,18 +51,16 @@ export default async function Home() {
       {/* CTA Section */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4">
-            Ready to Organize Your Brand Deals?
-          </h2>
+          <h2 className="text-3xl font-bold mb-4">Ready to Organize?</h2>
           <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
             Join content creators and influencers who've streamlined their
             collaboration workflow with our platform.
           </p>
           <a
             href="/dashboard"
-            className="inline-flex items-center px-6 py-3 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+            className="inline-flex items-center px-6 py-3 text-white bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 rounded-lg hover:bg-blue-700 transition-colors hover:brightness-95"
           >
-            Start Free Trial
+            Sign Up
             <ArrowUpRight className="ml-2 w-4 h-4" />
           </a>
         </div>

@@ -94,7 +94,7 @@
     transparent 30deg,
     transparent 360deg
   );
-  animation: spinLine 2s linear infinite;
+  animation: spinLine 3s linear infinite;
   z-index: -1;
   border-radius: 50%;
 }
@@ -122,7 +122,6 @@
 
 /* lock animation */
 
-/* Add to your existing CSS */
 @keyframes lock-pulse {
   0%,
   100% {

@@ -4,7 +4,7 @@ export default function Steps() {
       <div className="container mx-auto px-4">
         <div className="text-center mb-16 flex flex-col">
           <h2 className="text-3xl font-bold">Brand deals done</h2>
-          <h2 className="text-3xl font-bold mb-4">the influencer way</h2>
+          <h2 className="text-3xl font-bold mb-4">the creator way</h2>
         </div>
 
         <div className="flex flex-wrap justify-center gap-8 max-w-6xl mx-auto">

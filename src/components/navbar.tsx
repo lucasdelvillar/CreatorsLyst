@@ -38,7 +38,7 @@ export default async function Navbar() {
               </Link>
               <Link
                 href="/sign-up"
-                className="px-4 py-2 text-sm font-medium text-white bg-black rounded-md hover:bg-gray-800"
+                className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 rounded-md hover:brightness-95"
               >
                 Sign Up
               </Link>
