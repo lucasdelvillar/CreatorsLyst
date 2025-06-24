@@ -74,7 +74,11 @@ export const signUpAction = async (formData: FormData) => {
 
 export const signInWithGoogleAction = async () => {
   const supabase = await createClient();
-  const origin = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+
+  // Get the current origin from headers or use the Tempo dev URL
+  const origin =
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    "https://hardcore-ptolemy9-9utwh.view-3.tempo-dev.app";
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
@@ -92,7 +96,9 @@ export const signInWithGoogleAction = async () => {
 
 export const signInWithGitHubAction = async () => {
   const supabase = await createClient();
-  const origin = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const origin =
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    "https://hardcore-ptolemy9-9utwh.view-3.tempo-dev.app";
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "github",
@@ -110,7 +116,9 @@ export const signInWithGitHubAction = async () => {
 
 export const signInWithFacebookAction = async () => {
   const supabase = await createClient();
-  const origin = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const origin =
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    "https://hardcore-ptolemy9-9utwh.view-3.tempo-dev.app";
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "facebook",
@@ -128,7 +136,9 @@ export const signInWithFacebookAction = async () => {
 
 export const signInWithInstagramAction = async () => {
   const supabase = await createClient();
-  const origin = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const origin =
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    "https://hardcore-ptolemy9-9utwh.view-3.tempo-dev.app";
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "instagram",
