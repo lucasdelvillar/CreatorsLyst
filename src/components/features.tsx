@@ -52,8 +52,8 @@ export default function Features() {
                 className={`flex items-center gap-8 ${isEven ? "flex-row" : "flex-row-reverse"}`}
               >
                 {/* Icon card */}
-                <div className="w-[200px] h-[200px] flex items-center justify-center bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow flex-shrink-0">
-                  <div className="text-blue-600">{feature.icon}</div>
+                <div className="w-[200px] h-[200px] flex items-center justify-center bg-white rounded-xl shadow-xl hover:shadow-2xl transition-shadow flex-shrink-0">
+                  <div className="text-purple-600">{feature.icon}</div>
                 </div>
 
                 {/* Text content */}
