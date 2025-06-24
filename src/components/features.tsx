@@ -44,7 +44,15 @@ export default function Features() {
               ],
             },
             {
-              icon: <ShieldCheck className="w-8 h-8" />,
+              icon: (
+                <div className="lock-container">
+                  <div className="lock-shadow" />
+                  <ShieldCheck
+                    className="w-12 h-12 animate-lock animate-shield-pulse text-purple-600"
+                    strokeWidth={1.5}
+                  />
+                </div>
+              ),
               title: "Secure Integration",
               description: [
                 {
