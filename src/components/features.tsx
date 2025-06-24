@@ -1,3 +1,5 @@
+"use client";
+
 import {
   ScanEye,
   Glasses,
@@ -10,7 +12,42 @@ import {
   AudioWaveform,
   AlarmClockCheck,
   TextSelect,
+  Lock,
+  LockOpen,
 } from "lucide-react";
+
+import { useState, useEffect } from "react";
+
+const AnimatedLock = () => {
+  const [isLocked, setIsLocked] = useState(false);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIsLocked((prev) => !prev);
+    }, 2000); // Toggle every 2 seconds
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="relative w-12 h-12 flex items-center justify-center">
+      <div
+        className={`absolute transition-all duration-500 ${isLocked ? "opacity-100 scale-100" : "opacity-0 scale-90"}`}
+      >
+        <Lock className="w-7 h-7 text-purple-600" strokeWidth={1.5} />
+      </div>
+      <div
+        className={`absolute transition-all duration-500 ${isLocked ? "opacity-0 scale-90" : "opacity-100 scale-100"}`}
+      >
+        <LockOpen className="w-7 h-7 text-purple-600" strokeWidth={1.5} />
+      </div>
+
+      {/* Optional pulse circle */}
+      <div
+        className={`absolute inset-0 rounded-full border-2 border-purple-300 transition-all duration-700 ${isLocked ? "scale-100 opacity-30" : "scale-75 opacity-0"}`}
+      ></div>
+    </div>
+  );
+};
 
 export default function Features() {
   return (
@@ -44,15 +81,7 @@ export default function Features() {
               ],
             },
             {
-              icon: (
-                <div className="lock-container">
-                  <div className="lock-shadow" />
-                  <ShieldCheck
-                    className="w-12 h-12 animate-lock animate-shield-pulse text-purple-600"
-                    strokeWidth={1.5}
-                  />
-                </div>
-              ),
+              icon: <AnimatedLock />,
               title: "Secure Integration",
               description: [
                 {

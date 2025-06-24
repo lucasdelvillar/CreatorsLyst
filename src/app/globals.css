@@ -72,8 +72,8 @@
 
 .animated-gradient-wrapper {
   position: relative;
-  width: 208px;
-  height: 208px;
+  width: 207px;
+  height: 207px;
   border-radius: 1rem;
   padding: 4px;
   z-index: 0;
@@ -122,80 +122,19 @@
 
 /* lock animation */
 
-@keyframes lock-action {
-  0% {
-    transform: rotate(0deg) scale(1);
-  }
-  20% {
-    transform: rotate(10deg) scale(1.1);
-  }
-  40% {
-    transform: rotate(-5deg) scale(1.1);
-  }
-  60% {
-    transform: rotate(5deg) scale(1.1);
-  }
-  80% {
-    transform: rotate(-2deg) scale(1.05);
-  }
+/* Add to your existing CSS */
+@keyframes lock-pulse {
+  0%,
   100% {
-    transform: rotate(0deg) scale(1);
-  }
-}
-
-@keyframes shield-pulse {
-  0% {
+    transform: scale(1);
     opacity: 1;
   }
   50% {
-    opacity: 0.7;
-  }
-  100% {
-    opacity: 1;
+    transform: scale(1.05);
+    opacity: 0.9;
   }
 }
 
-.animate-lock {
-  animation: lock-action 2s ease-in-out infinite;
-  transform-origin: top center;
+.animate-lock-pulse {
+  animation: lock-pulse 3s ease-in-out infinite;
 }
-
-.animate-shield-pulse {
-  animation: shield-pulse 4s ease-in-out infinite;
-}
-
-.lock-container {
-  position: relative;
-  width: 200px;
-  height: 200px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.lock-shadow {
-  position: absolute;
-  width: 60px;
-  height: 60px;
-  background: rgba(93, 11, 235, 0.2);
-  border-radius: 50%;
-  filter: blur(10px);
-  bottom: 70px;
-  animation: shield-pulse 4s ease-in-out infinite;
-}
-
-@keyframes data-stream {
-  0% {
-    transform: translateY(-10px) scaleX(0.8);
-    opacity: 0;
-  }
-  30% {
-    opacity: 0.7;
-  }
-  100% {
-    transform: translateY(10px) scaleX(1.2);
-    opacity: 0;
-  }
-}
-
-/* Deal Dashboard animation */
