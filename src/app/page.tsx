@@ -32,7 +32,7 @@ export default async function Home() {
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold mb-4 flex flex-col">
               <span className=""> No Fluff, </span>
-              <span> Just Features You&apos;ll use </span>
+              <span> Just Features You&apos;ll Use </span>
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
               Choose the perfect plan.
@@ -49,7 +49,7 @@ export default async function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 pb-32 bg-white">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Organize?</h2>
           <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
@@ -57,8 +57,8 @@ export default async function Home() {
             collaboration workflow with our platform.
           </p>
           <a
-            href="/dashboard"
-            className="inline-flex items-center px-6 py-3 text-white bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 rounded-lg hover:bg-blue-700 transition-colors hover:brightness-95"
+            href="/sign-up"
+            className="inline-flex items-center px-6 py-3 text-white bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 rounded-lg hover:brightness-95"
           >
             Sign Up
             <ArrowUpRight className="ml-2 w-4 h-4" />

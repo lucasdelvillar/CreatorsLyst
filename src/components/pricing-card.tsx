@@ -24,21 +24,21 @@ export default function PricingCard({
   const features: Record<string, string[]> = {
     price_1OSrPUFQRFibPDrOJoWhFhOq: [
       // starter
-      "Connect 1 inbox (Gmail, Outlook, etc.)",
-      "Auto-organize brand deal emails (filters & labels)",
+      "Connect 1 account (Gmail, Outlook, Instagram, etc.)",
+      "Auto-organize brand deals (filters & labels)",
       "Brand deal tracking (status: new, responded, completed)",
       "5 active deals at a time",
     ],
     price_1RcHTXFQRFibPDrOf9N91VcP: [
       // pro
-      "Connect 3 inboxes (Gmail, Outlook, etc.)",
+      "Connect 2 accounts (Gmail, Outlook, Instagram etc.)",
       "Auto-organize brand deal emails (filters & labels)",
       "Brand deal tracking (status: new, responded, completed)",
-      "30 active deals at a time",
+      "10 active deals at a time",
     ],
     price_1RcHUyFQRFibPDrOFxEMiEbp: [
       // studio
-      "Unlimited inbox Connections (Gmail, Outlook, etc.)",
+      "Unlimited account connections (Gmail, Outlook, Instagram etc.)",
       "Auto-organize brand deal emails (filters & labels)",
       "Brand deal tracking (status: new, responded, completed)",
       "Unlimited active deals at a time",
