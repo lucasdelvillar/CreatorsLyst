@@ -67,3 +67,53 @@
     @apply bg-background text-foreground;
   }
 }
+
+.animated-gradient-wrapper {
+  position: relative;
+  width: 208px;
+  height: 208px;
+  border-radius: 1rem;
+  padding: 4px;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.animated-gradient-wrapper::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    #a855f7 20deg,
+    transparent 30deg,
+    transparent 360deg
+  );
+  animation: spinLine 2s linear infinite;
+  z-index: -1;
+  border-radius: 50%;
+}
+
+.animated-gradient-wrapper::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  right: 4px;
+  bottom: 4px;
+  background: white;
+  border-radius: 0.75rem;
+  z-index: 1;
+}
+
+@keyframes spinLine {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

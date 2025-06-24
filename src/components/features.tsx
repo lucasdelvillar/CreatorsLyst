@@ -90,12 +90,22 @@ export default function Features() {
             return (
               <div
                 key={index}
-                className={`flex items-center gap-8 ${isEven ? "flex-row" : "flex-row-reverse"}`}
+                className={`flex items-center gap-8 ${
+                  isEven ? "flex-row" : "flex-row-reverse"
+                }`}
               >
-                {/* Icon card */}
-                <div className="w-[200px] h-[200px] flex items-center justify-center bg-white rounded-xl shadow-xl hover:shadow-2xl transition-shadow flex-shrink-0">
-                  <div className="text-purple-600">{feature.icon}</div>
-                </div>
+                {/* Animated wrapper only for first card */}
+                {index === 0 ? (
+                  <div className="animated-gradient-wrapper">
+                    <div className="relative z-10 w-[200px] h-[200px] flex items-center justify-center rounded-xl shadow-xl hover:shadow-2xl transition-shadow">
+                      <div className="text-purple-600">{feature.icon}</div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="w-[200px] h-[200px] flex items-center justify-center bg-white rounded-xl shadow-xl hover:shadow-2xl transition-shadow flex-shrink-0 relative z-10">
+                    <div className="text-purple-600">{feature.icon}</div>
+                  </div>
+                )}
 
                 {/* Text content */}
                 <div className="flex-1 text-left">
