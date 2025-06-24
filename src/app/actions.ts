@@ -75,15 +75,11 @@ export const signUpAction = async (formData: FormData) => {
 export const signInWithGoogleAction = async () => {
   const supabase = await createClient();
 
-  // Get the current origin from headers or use the Tempo dev URL
-  const origin =
-    process.env.NEXT_PUBLIC_SITE_URL ||
-    "https://hardcore-ptolemy9-9utwh.view-3.tempo-dev.app";
-
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
     options: {
-      redirectTo: `${origin}/auth/callback`,
+      redirectTo:
+        "https://hardcore-ptolemy9-9utwh.view-3.tempo-dev.app/auth/callback?redirect_to=/dashboard",
     },
   });
 
@@ -96,14 +92,12 @@ export const signInWithGoogleAction = async () => {
 
 export const signInWithGitHubAction = async () => {
   const supabase = await createClient();
-  const origin =
-    process.env.NEXT_PUBLIC_SITE_URL ||
-    "https://hardcore-ptolemy9-9utwh.view-3.tempo-dev.app";
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "github",
     options: {
-      redirectTo: `${origin}/auth/callback`,
+      redirectTo:
+        "https://hardcore-ptolemy9-9utwh.view-3.tempo-dev.app/auth/callback?redirect_to=/dashboard",
     },
   });
 
@@ -116,14 +110,12 @@ export const signInWithGitHubAction = async () => {
 
 export const signInWithFacebookAction = async () => {
   const supabase = await createClient();
-  const origin =
-    process.env.NEXT_PUBLIC_SITE_URL ||
-    "https://hardcore-ptolemy9-9utwh.view-3.tempo-dev.app";
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "facebook",
     options: {
-      redirectTo: `${origin}/auth/callback`,
+      redirectTo:
+        "https://hardcore-ptolemy9-9utwh.view-3.tempo-dev.app/auth/callback?redirect_to=/dashboard",
     },
   });
 
@@ -136,14 +128,12 @@ export const signInWithFacebookAction = async () => {
 
 export const signInWithInstagramAction = async () => {
   const supabase = await createClient();
-  const origin =
-    process.env.NEXT_PUBLIC_SITE_URL ||
-    "https://hardcore-ptolemy9-9utwh.view-3.tempo-dev.app";
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "instagram",
     options: {
-      redirectTo: `${origin}/auth/callback`,
+      redirectTo:
+        "https://hardcore-ptolemy9-9utwh.view-3.tempo-dev.app/auth/callback?redirect_to=/dashboard",
     },
   });
 
