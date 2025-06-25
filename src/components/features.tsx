@@ -43,12 +43,15 @@ const AnimatedLock = () => {
 
       {/* Optional pulse circle */}
       <div
-        className={`absolute inset-0 rounded-full border-2 border-gradient-to-r from-purple-600 via-pink-500 to-orange-400 transition-all duration-700 ${isLocked ? "scale-100 opacity-30" : "scale-75 opacity-0"}`}
+        className={`absolute inset-0 rounded-full transition-all duration-700 ${isLocked ? "scale-100 opacity-30" : "scale-75 opacity-0"}`}
         style={{
-          borderImage:
-            "linear-gradient(to right, rgb(147 51 234), rgb(236 72 153), rgb(251 146 60)) 1",
+          background:
+            "linear-gradient(to right, rgb(147 51 234), rgb(236 72 153), rgb(251 146 60))",
+          padding: "2px",
         }}
-      ></div>
+      >
+        <div className="w-full h-full rounded-full bg-white"></div>
+      </div>
     </div>
   );
 };
