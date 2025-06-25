@@ -43,7 +43,11 @@ const AnimatedLock = () => {
 
       {/* Optional pulse circle */}
       <div
-        className={`absolute inset-0 rounded-full border-2 border-purple-300 transition-all duration-700 ${isLocked ? "scale-100 opacity-30" : "scale-75 opacity-0"}`}
+        className={`absolute inset-0 rounded-full border-2 border-gradient-to-r from-purple-600 via-pink-500 to-orange-400 transition-all duration-700 ${isLocked ? "scale-100 opacity-30" : "scale-75 opacity-0"}`}
+        style={{
+          borderImage:
+            "linear-gradient(to right, rgb(147 51 234), rgb(236 72 153), rgb(251 146 60)) 1",
+        }}
       ></div>
     </div>
   );
@@ -67,16 +71,16 @@ export default function Features() {
         <div className="flex flex-col gap-16 max-w-5xl mx-auto">
           {[
             {
-              icon: <Zap className="w-8 h-8" />,
+              icon: <Zap className="w-8 h-8 text-purple-600" />,
               title: "Smart Scanning",
               description: [
                 {
                   text: "Automatically identifies brand deals from your inbox or DMs",
-                  icon: <Glasses className="w-5 h-5 text-purple-500 mt-1" />,
+                  icon: <Glasses className="w-5 h-5 text-purple-600 mt-1" />,
                 },
                 {
                   text: "Pulls out the important details, like brand name and payment",
-                  icon: <ScanEye className="w-5 h-5 text-purple-500 mt-1" />,
+                  icon: <ScanEye className="w-5 h-5 text-purple-600 mt-1" />,
                 },
               ],
             },
@@ -87,38 +91,38 @@ export default function Features() {
                 {
                   text: "No passwords shared — just simple, secure logins",
                   icon: (
-                    <Fingerprint className="w-5 h-5 text-purple-500 mt-1" />
+                    <Fingerprint className="w-5 h-5 text-purple-600 mt-1" />
                   ),
                 },
                 {
                   text: "Your info stays private and protected at all times",
-                  icon: <EyeOff className="w-5 h-5 text-purple-500 mt-1" />,
+                  icon: <EyeOff className="w-5 h-5 text-purple-600 mt-1" />,
                 },
                 {
                   text: "You choose what to connect and what to keep separate",
-                  icon: <Drama className="w-5 h-5 text-purple-500 mt-1" />,
+                  icon: <Drama className="w-5 h-5 text-purple-600 mt-1" />,
                 },
               ],
             },
             {
-              icon: <Users className="w-8 h-8" />,
+              icon: <Users className="w-8 h-8 text-purple-600" />,
               title: "Deal Dashboard",
               description: [
                 {
                   text: "Track deal status — from first message to final payment",
                   icon: (
-                    <AudioWaveform className="w-5 h-5 text-purple-500 mt-1" />
+                    <AudioWaveform className="w-5 h-5 text-purple-600 mt-1" />
                   ),
                 },
                 {
                   text: "Stay on top of deadlines and deliverables",
                   icon: (
-                    <AlarmClockCheck className="w-5 h-5 text-purple-500 mt-1" />
+                    <AlarmClockCheck className="w-5 h-5 text-purple-600 mt-1" />
                   ),
                 },
                 {
                   text: "No more messy spreadsheets or lost emails",
-                  icon: <TextSelect className="w-5 h-5 text-purple-500 mt-1" />,
+                  icon: <TextSelect className="w-5 h-5 text-purple-600 mt-1" />,
                 },
               ],
             },

@@ -90,8 +90,10 @@
   background: conic-gradient(
     from 0deg,
     transparent 0deg,
-    #a855f7 20deg,
-    transparent 30deg,
+    #9333ea 10deg,
+    #ec4899 20deg,
+    #fb923c 30deg,
+    transparent 40deg,
     transparent 360deg
   );
   animation: spinLine 3s linear infinite;
