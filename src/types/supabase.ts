@@ -9,6 +9,116 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      brand_deals: {
+        Row: {
+          brand_name: string
+          created_at: string
+          currency: string | null
+          deadline: string | null
+          email_account_id: string
+          email_body: string | null
+          email_id: string | null
+          email_subject: string | null
+          id: string
+          offer_amount: number | null
+          sender_email: string | null
+          status: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          brand_name: string
+          created_at?: string
+          currency?: string | null
+          deadline?: string | null
+          email_account_id: string
+          email_body?: string | null
+          email_id?: string | null
+          email_subject?: string | null
+          id?: string
+          offer_amount?: number | null
+          sender_email?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          brand_name?: string
+          created_at?: string
+          currency?: string | null
+          deadline?: string | null
+          email_account_id?: string
+          email_body?: string | null
+          email_id?: string | null
+          email_subject?: string | null
+          id?: string
+          offer_amount?: number | null
+          sender_email?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brand_deals_email_account_id_fkey"
+            columns: ["email_account_id"]
+            isOneToOne: false
+            referencedRelation: "email_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brand_deals_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      email_accounts: {
+        Row: {
+          access_token: string | null
+          created_at: string
+          email_address: string
+          id: string
+          is_connected: boolean | null
+          provider: string
+          refresh_token: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          access_token?: string | null
+          created_at?: string
+          email_address: string
+          id?: string
+          is_connected?: boolean | null
+          provider: string
+          refresh_token?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          access_token?: string | null
+          created_at?: string
+          email_address?: string
+          id?: string
+          is_connected?: boolean | null
+          provider?: string
+          refresh_token?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_accounts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       subscriptions: {
         Row: {
           amount: number | null

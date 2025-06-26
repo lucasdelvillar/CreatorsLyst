@@ -233,3 +233,172 @@ export const checkUserSubscription = async (userId: string) => {
 
   return !!subscription;
 };
+
+export const getUserSubscriptionTier = async (userId: string) => {
+  const supabase = await createClient();
+
+  const { data: subscription, error } = await supabase
+    .from("subscriptions")
+    .select("price_id")
+    .eq("user_id", userId)
+    .eq("status", "active")
+    .single();
+
+  if (error || !subscription) {
+    return "starter";
+  }
+
+  // Map price IDs to subscription tiers
+  const tierMap: { [key: string]: string } = {
+    price_1OSrPUFQRFibPDrOJoWhFhOq: "starter",
+    price_1RcHTXFQRFibPDrOf9N91VcP: "pro",
+    price_1RcHUyFQRFibPDrOFxEMiEbp: "studio",
+  };
+
+  console.log(tierMap[subscription.price_id]);
+
+  return tierMap[subscription.price_id] || "starter";
+};
+
+export const getSubscriptionLimits = (tier: string) => {
+  const limits = {
+    starter: { emailAccounts: 1, activeDeals: 5 },
+    pro: { emailAccounts: 3, activeDeals: 30 },
+    studio: { emailAccounts: -1, activeDeals: -1 }, // -1 means unlimited
+  };
+
+  return limits[tier as keyof typeof limits] || limits.starter;
+};
+
+export const addEmailAccount = async (formData: FormData) => {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return encodedRedirect("error", "/dashboard", "User not authenticated");
+  }
+
+  const emailAddress = formData.get("email_address")?.toString();
+  const provider = formData.get("provider")?.toString();
+
+  if (!emailAddress || !provider) {
+    return encodedRedirect(
+      "error",
+      "/dashboard",
+      "Email address and provider are required",
+    );
+  }
+
+  // Check subscription limits
+  const tier = await getUserSubscriptionTier(user.id);
+  const limits = getSubscriptionLimits(tier);
+
+  if (limits.emailAccounts !== -1) {
+    const { data: existingAccounts } = await supabase
+      .from("email_accounts")
+      .select("id")
+      .eq("user_id", user.id);
+
+    if (existingAccounts && existingAccounts.length >= limits.emailAccounts) {
+      return encodedRedirect(
+        "error",
+        "/dashboard",
+        `Your ${tier} plan allows only ${limits.emailAccounts} email account${limits.emailAccounts > 1 ? "s" : ""}. Upgrade to add more.`,
+      );
+    }
+  }
+
+  const { error } = await supabase.from("email_accounts").insert({
+    user_id: user.id,
+    email_address: emailAddress,
+    provider: provider,
+    is_connected: false,
+  });
+
+  if (error) {
+    if (error.code === "23505") {
+      // Unique constraint violation
+      return encodedRedirect(
+        "error",
+        "/dashboard",
+        "This email account is already added",
+      );
+    }
+    return encodedRedirect(
+      "error",
+      "/dashboard",
+      "Failed to add email account",
+    );
+  }
+
+  return encodedRedirect(
+    "success",
+    "/dashboard",
+    "Email account added successfully",
+  );
+};
+
+export const removeEmailAccount = async (accountId: string) => {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return encodedRedirect("error", "/dashboard", "User not authenticated");
+  }
+
+  const { error } = await supabase
+    .from("email_accounts")
+    .delete()
+    .eq("id", accountId)
+    .eq("user_id", user.id);
+
+  if (error) {
+    return encodedRedirect(
+      "error",
+      "/dashboard",
+      "Failed to remove email account",
+    );
+  }
+
+  return encodedRedirect(
+    "success",
+    "/dashboard",
+    "Email account removed successfully",
+  );
+};
+
+export const getUserEmailAccounts = async (userId: string) => {
+  const supabase = await createClient();
+
+  const { data: accounts, error } = await supabase
+    .from("email_accounts")
+    .select("*")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    return [];
+  }
+
+  return accounts || [];
+};
+
+export const getUserActiveDealsCount = async (userId: string) => {
+  const supabase = await createClient();
+
+  const { data: deals, error } = await supabase
+    .from("brand_deals")
+    .select("id")
+    .eq("user_id", userId)
+    .in("status", ["pending", "responded", "accepted"]);
+
+  if (error) {
+    return 0;
+  }
+
+  return deals?.length || 0;
+};

@@ -17,7 +17,7 @@ export default async function Home() {
     "supabase-functions-get-plans",
   );
 
-  console.log("Plans fetched from Supabase:", plans);
+  //console.log("Plans fetched from Supabase:", plans); //debug
 
   return (
     <div className="min-h-screen">
