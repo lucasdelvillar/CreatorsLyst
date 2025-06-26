@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Mail, Plus, CheckCircle, XCircle } from "lucide-react";
 import { AddEmailAccountDialog } from "./add-email-account-dialog";
 import RemoveEmailAccountButton from "./remove-email-account-button";
+import ConnectGmailButton from "./connect-gmail-button";
 
 interface EmailAccount {
   id: string;
@@ -39,7 +40,7 @@ export default function EmailAccounts({
     limits.emailAccounts === -1 || accounts.length < limits.emailAccounts;
 
   return (
-    <div className="bg-white space-y-6">
+    <div className="bg-gray-50 space-y-6">
       {/* Header Section */}
       <div className="flex justify-between items-start">
         <div>
@@ -148,9 +149,12 @@ export default function EmailAccounts({
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  {!account.is_connected && (
-                    <Button variant="outline" size="sm">
-                      Connect
+                  {!account.is_connected && account.provider === "gmail" && (
+                    <ConnectGmailButton accountId={account.id} />
+                  )}
+                  {!account.is_connected && account.provider === "outlook" && (
+                    <Button variant="outline" size="sm" disabled>
+                      Connect (Coming Soon)
                     </Button>
                   )}
                   <RemoveEmailAccountButton accountId={account.id} />

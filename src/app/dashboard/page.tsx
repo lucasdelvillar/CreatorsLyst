@@ -32,6 +32,10 @@ export default async function Dashboard() {
   const emailAccounts = await getUserEmailAccounts(user.id);
   const activeDealsCount = await getUserActiveDealsCount(user.id);
 
+  // DEBUG
+  console.log(emailAccounts);
+  console.log(activeDealsCount);
+
   return (
     <SubscriptionCheck>
       <DashboardNavbar />

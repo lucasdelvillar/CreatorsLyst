@@ -255,8 +255,6 @@ export const getUserSubscriptionTier = async (userId: string) => {
     price_1RcHUyFQRFibPDrOFxEMiEbp: "studio",
   };
 
-  console.log(tierMap[subscription.price_id]);
-
   return tierMap[subscription.price_id] || "starter";
 };
 
@@ -401,4 +399,138 @@ export const getUserActiveDealsCount = async (userId: string) => {
   }
 
   return deals?.length || 0;
+};
+
+export const connectGmailAccount = async (accountId: string) => {
+  // DEBUG
+  console.log("Start of actions.ts debug session: connectGmailAccount()");
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return encodedRedirect("error", "/dashboard", "User not authenticated");
+  }
+
+  // Verify the account belongs to the user
+  const { data: account, error: accountError } = await supabase
+    .from("email_accounts")
+    .select("*")
+    .eq("id", accountId)
+    .eq("user_id", user.id)
+    .single();
+
+  if (accountError || !account) {
+    return encodedRedirect("error", "/dashboard", "Email account not found");
+  }
+
+  // DEBUG
+  //console.log(process.env.GOOGLE_CLIENT_ID); // had to restart the server to have my environment variables updated
+  //console.log(process.env);
+
+  // Generate OAuth URL for Gmail
+  const clientId = process.env.GOOGLE_CLIENT_ID;
+  const redirectUri = `${process.env.NEXT_PUBLIC_SITE_URL || "https://hardcore-ptolemy9-9utwh.view-3.tempo-dev.app"}/auth/gmail/callback`; // DEBUG stuck here since my redirect URI is not authorized. Had to update my google cloud console to allow this link to work
+  const scope = "https://www.googleapis.com/auth/gmail.readonly";
+  const state = accountId; // Pass account ID as state parameter
+
+  if (!clientId) {
+    return encodedRedirect(
+      "error",
+      "/dashboard",
+      "Gmail integration not configured. Please contact support.",
+    );
+  }
+
+  const authUrl =
+    `https://accounts.google.com/o/oauth2/v2/auth?` +
+    `client_id=${clientId}&` +
+    `redirect_uri=${encodeURIComponent(redirectUri)}&` +
+    `scope=${encodeURIComponent(scope)}&` +
+    `response_type=code&` +
+    `access_type=offline&` +
+    `prompt=consent&` +
+    `state=${state}`;
+
+  return redirect(authUrl);
+};
+
+// used in route.ts
+export const handleGmailCallback = async (code: string, state: string) => {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return encodedRedirect("error", "/dashboard", "User not authenticated");
+  }
+
+  const accountId = state;
+
+  // Verify the account belongs to the user
+  const { data: account, error: accountError } = await supabase
+    .from("email_accounts")
+    .select("*")
+    .eq("id", accountId)
+    .eq("user_id", user.id)
+    .single();
+
+  if (accountError || !account) {
+    return encodedRedirect("error", "/dashboard", "Email account not found");
+  }
+
+  try {
+    // Exchange authorization code for access token
+    const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams({
+        client_id: process.env.GOOGLE_CLIENT_ID!,
+        client_secret: process.env.GOOGLE_CLIENT_SECRET!,
+        code,
+        grant_type: "authorization_code",
+        redirect_uri: `${process.env.NEXT_PUBLIC_SITE_URL || "https://hardcore-ptolemy9-9utwh.view-3.tempo-dev.app"}/auth/gmail/callback`,
+      }),
+    });
+
+    const tokenData = await tokenResponse.json();
+
+    if (!tokenResponse.ok) {
+      throw new Error(
+        tokenData.error_description || "Failed to get access token",
+      );
+    }
+
+    // Update the email account with the access token
+    const { error: updateError } = await supabase
+      .from("email_accounts")
+      .update({
+        access_token: tokenData.access_token,
+        refresh_token: tokenData.refresh_token,
+        is_connected: true,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", accountId)
+      .eq("user_id", user.id);
+
+    if (updateError) {
+      throw new Error("Failed to update email account");
+    }
+
+    return encodedRedirect(
+      "success",
+      "/dashboard",
+      "Gmail account connected successfully!",
+    );
+  } catch (error) {
+    return encodedRedirect(
+      "error",
+      "/dashboard",
+      `Failed to connect Gmail account: ${error instanceof Error ? error.message : "Unknown error"}`,
+    );
+  }
 };
