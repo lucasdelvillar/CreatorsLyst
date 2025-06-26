@@ -22,11 +22,7 @@ export default async function Dashboard() {
         <div className="container mx-auto px-4 py-8 flex flex-col gap-8">
           {/* Header Section */}
           <header className="flex flex-col gap-4">
-            <h1 className="text-3xl font-bold">Dashboard</h1>
-            <div className="bg-secondary/50 text-sm p-3 px-4 rounded-lg text-muted-foreground flex gap-2 items-center">
-              <InfoIcon size="14" />
-              <span>This is a protected page only visible to authenticated users</span>
-            </div>
+            Welcome to your Dashboard
           </header>
 
           {/* User Profile Section */}
@@ -37,11 +33,6 @@ export default async function Dashboard() {
                 <h2 className="font-semibold text-xl">User Profile</h2>
                 <p className="text-sm text-muted-foreground">{user.email}</p>
               </div>
-            </div>
-            <div className="bg-muted/50 rounded-lg p-4 overflow-hidden">
-              <pre className="text-xs font-mono max-h-48 overflow-auto">
-                {JSON.stringify(user, null, 2)}
-              </pre>
             </div>
           </section>
         </div>
