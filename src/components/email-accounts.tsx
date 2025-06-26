@@ -7,9 +7,9 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Mail, Plus, Trash2, CheckCircle, XCircle } from "lucide-react";
+import { Mail, Plus, CheckCircle, XCircle } from "lucide-react";
 import { AddEmailAccountDialog } from "./add-email-account-dialog";
-import { removeEmailAccount } from "@/app/actions";
+import RemoveEmailAccountButton from "./remove-email-account-button";
 
 interface EmailAccount {
   id: string;
@@ -37,10 +37,6 @@ export default function EmailAccounts({
 }: EmailAccountsProps) {
   const canAddMore =
     limits.emailAccounts === -1 || accounts.length < limits.emailAccounts;
-
-  const handleRemoveAccount = async (accountId: string) => {
-    await removeEmailAccount(accountId);
-  };
 
   return (
     <div className="bg-white space-y-6">
@@ -157,14 +153,7 @@ export default function EmailAccounts({
                       Connect
                     </Button>
                   )}
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleRemoveAccount(account.id)}
-                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  <RemoveEmailAccountButton accountId={account.id} />
                 </div>
               </CardContent>
             </Card>
