@@ -33,8 +33,8 @@ export default async function Dashboard() {
   const activeDealsCount = await getUserActiveDealsCount(user.id);
 
   // DEBUG
-  console.log(emailAccounts);
-  console.log(activeDealsCount);
+  //console.log(emailAccounts);
+  //console.log(activeDealsCount);
 
   return (
     <SubscriptionCheck>

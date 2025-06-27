@@ -425,13 +425,9 @@ export const connectGmailAccount = async (accountId: string) => {
     return encodedRedirect("error", "/dashboard", "Email account not found");
   }
 
-  // DEBUG
-  //console.log(process.env.GOOGLE_CLIENT_ID); // had to restart the server to have my environment variables updated
-  //console.log(process.env);
-
   // Generate OAuth URL for Gmail
   const clientId = process.env.GOOGLE_CLIENT_ID;
-  const redirectUri = `${process.env.NEXT_PUBLIC_SITE_URL || "https://hardcore-ptolemy9-9utwh.view-3.tempo-dev.app"}/auth/gmail/callback`; // DEBUG stuck here since my redirect URI is not authorized. Had to update my google cloud console to allow this link to work
+  const redirectUri = `${process.env.NEXT_PUBLIC_SITE_URL || "https://hardcore-ptolemy9-9utwh.view-3.tempo-dev.app"}/auth/gmail/callback`; // DEBUG: stuck here since my redirect URI is not authorized. Had to update my google cloud console to allow this link to work
   const scope = "https://www.googleapis.com/auth/gmail.readonly";
   const state = accountId; // Pass account ID as state parameter
 
@@ -458,16 +454,19 @@ export const connectGmailAccount = async (accountId: string) => {
 
 // used in route.ts
 export const handleGmailCallback = async (code: string, state: string) => {
+  console.log("=== Gmail Callback Debug Start ===");
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   if (!user) {
+    console.log("ERROR: User not authenticated");
     return encodedRedirect("error", "/dashboard", "User not authenticated");
   }
 
   const accountId = state;
+  console.log("Account ID from state:", accountId);
 
   // Verify the account belongs to the user
   const { data: account, error: accountError } = await supabase
@@ -477,33 +476,122 @@ export const handleGmailCallback = async (code: string, state: string) => {
     .eq("user_id", user.id)
     .single();
 
-  if (accountError || !account) {
+  if (accountError) {
+    console.log("Database error finding account:", accountError);
     return encodedRedirect("error", "/dashboard", "Email account not found");
   }
 
+  if (!account) {
+    console.log("No account found for ID:", accountId);
+    return encodedRedirect("error", "/dashboard", "Email account not found");
+  }
+
+  console.log("Found account:", {
+    id: account.id,
+    email: account.email_address,
+    provider: account.provider,
+    isConnected: account.is_connected,
+  });
+
+  // Validate environment variables
+  const clientId = process.env.GOOGLE_CLIENT_ID;
+  const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+
+  console.log("Environment check:", {
+    hasClientId: !!clientId,
+    hasClientSecret: !!clientSecret,
+    clientIdLength: clientId?.length || 0,
+    clientSecretLength: clientSecret?.length || 0,
+  });
+
+  if (!clientId || !clientSecret) {
+    console.log("ERROR: Missing Google OAuth credentials");
+    return encodedRedirect(
+      "error",
+      "/dashboard",
+      "Gmail integration not configured. Missing OAuth credentials.",
+    );
+  }
+
   try {
+    const redirectUri = `${process.env.NEXT_PUBLIC_SITE_URL || "https://hardcore-ptolemy9-9utwh.view-3.tempo-dev.app"}/auth/gmail/callback`;
+
+    console.log("=== Token Exchange Request ===");
+    console.log("Redirect URI:", redirectUri);
+    console.log("Code length:", code.length);
+    console.log(
+      "Client ID (first 20 chars):",
+      clientId.substring(0, 20) + "...",
+    );
+
+    const requestBody = {
+      client_id: clientId,
+      client_secret: clientSecret,
+      code,
+      grant_type: "authorization_code",
+      redirect_uri: redirectUri,
+    };
+
+    console.log("Request body keys:", Object.keys(requestBody));
+
     // Exchange authorization code for access token
     const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
-      body: new URLSearchParams({
-        client_id: process.env.GOOGLE_CLIENT_ID!,
-        client_secret: process.env.GOOGLE_CLIENT_SECRET!,
-        code,
-        grant_type: "authorization_code",
-        redirect_uri: `${process.env.NEXT_PUBLIC_SITE_URL || "https://hardcore-ptolemy9-9utwh.view-3.tempo-dev.app"}/auth/gmail/callback`,
-      }),
+      body: new URLSearchParams(requestBody),
     });
 
+    console.log("=== Token Response ===");
+    console.log("Status:", tokenResponse.status);
+    console.log("Status Text:", tokenResponse.statusText);
+    console.log(
+      "Headers:",
+      Object.fromEntries(tokenResponse.headers.entries()),
+    );
+
     const tokenData = await tokenResponse.json();
+    console.log("Response body:", JSON.stringify(tokenData, null, 2));
 
     if (!tokenResponse.ok) {
-      throw new Error(
-        tokenData.error_description || "Failed to get access token",
-      );
+      const errorMessage =
+        tokenData.error_description ||
+        tokenData.error ||
+        "Failed to get access token";
+      console.log("=== TOKEN EXCHANGE FAILED ===");
+      console.log("Error:", errorMessage);
+      console.log("Full error object:", tokenData);
+
+      // Provide more specific error messages
+      if (tokenData.error === "invalid_client") {
+        throw new Error(
+          "Invalid Google OAuth client credentials. Please check your GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET.",
+        );
+      } else if (tokenData.error === "invalid_grant") {
+        throw new Error(
+          "Invalid authorization code. The code may have expired or already been used.",
+        );
+      } else if (tokenData.error === "redirect_uri_mismatch") {
+        throw new Error(
+          `Redirect URI mismatch. Expected: ${redirectUri}. Please check your Google Cloud Console OAuth settings.`,
+        );
+      }
+
+      throw new Error(errorMessage);
     }
+
+    if (!tokenData.access_token) {
+      console.log("ERROR: No access token in response");
+      throw new Error("No access token received from Google");
+    }
+
+    console.log("=== Updating Database ===");
+    console.log(
+      "Access token received (first 20 chars):",
+      tokenData.access_token.substring(0, 20) + "...",
+    );
+    console.log("Has refresh token:", !!tokenData.refresh_token);
 
     // Update the email account with the access token
     const { error: updateError } = await supabase
@@ -518,15 +606,29 @@ export const handleGmailCallback = async (code: string, state: string) => {
       .eq("user_id", user.id);
 
     if (updateError) {
-      throw new Error("Failed to update email account");
+      console.log("ERROR: Database update failed:", updateError);
+      throw new Error("Failed to update email account in database");
     }
 
+    console.log("=== SUCCESS ===");
+    console.log("Gmail account connected successfully for account:", accountId);
     return encodedRedirect(
       "success",
       "/dashboard",
       "Gmail account connected successfully!",
     );
   } catch (error) {
+    console.log("=== FINAL ERROR ===");
+    console.log("Error type:", typeof error);
+    console.log(
+      "Error message:",
+      error instanceof Error ? error.message : String(error),
+    );
+    console.log(
+      "Error stack:",
+      error instanceof Error ? error.stack : "No stack trace",
+    );
+
     return encodedRedirect(
       "error",
       "/dashboard",
