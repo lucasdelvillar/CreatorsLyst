@@ -360,51 +360,74 @@ export const removeEmailAccount = async (accountId: string) => {
     return encodedRedirect("error", "/dashboard", "Email account not found");
   }
 
-  // Revoke Google OAuth permissions if it's a Gmail account with an access token
-  if (account.provider === "gmail" && account.access_token) {
-    try {
-      const revokeResponse = await fetch(
-        `https://oauth2.googleapis.com/revoke?token=${account.access_token}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-        },
-      );
+  try {
+    // First, delete all brand deals associated with this email account
+    const { error: brandDealsError } = await supabase
+      .from("brand_deals")
+      .delete()
+      .eq("email_account_id", accountId)
+      .eq("user_id", user.id);
 
-      // Note: Google's revoke endpoint returns 200 even for invalid tokens
-      // so we don't need to handle errors here strictly
-      if (!revokeResponse.ok) {
-        console.log(
-          "Warning: Failed to revoke Google OAuth token, but continuing with account deletion",
-        );
-      }
-    } catch (error) {
-      console.log("Warning: Error revoking Google OAuth token:", error);
-      // Continue with deletion even if revocation fails
+    if (brandDealsError) {
+      console.log("Warning: Error deleting brand deals:", brandDealsError);
+      // Continue with account deletion even if brand deals deletion fails
     }
-  }
 
-  const { error } = await supabase
-    .from("email_accounts")
-    .delete()
-    .eq("id", accountId)
-    .eq("user_id", user.id);
+    // Revoke Google OAuth permissions if it's a Gmail account with an access token
+    if (account.provider === "gmail" && account.access_token) {
+      try {
+        const revokeResponse = await fetch(
+          `https://oauth2.googleapis.com/revoke?token=${account.access_token}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+          },
+        );
 
-  if (error) {
+        // Note: Google's revoke endpoint returns 200 even for invalid tokens
+        // so we don't need to handle errors here strictly
+        if (!revokeResponse.ok) {
+          console.log(
+            "Warning: Failed to revoke Google OAuth token, but continuing with account deletion",
+          );
+        }
+      } catch (error) {
+        console.log("Warning: Error revoking Google OAuth token:", error);
+        // Continue with deletion even if revocation fails
+      }
+    }
+
+    // Finally, delete the email account
+    const { error: deleteError } = await supabase
+      .from("email_accounts")
+      .delete()
+      .eq("id", accountId)
+      .eq("user_id", user.id);
+
+    if (deleteError) {
+      console.log("Error deleting email account:", deleteError);
+      return encodedRedirect(
+        "error",
+        "/dashboard",
+        "Failed to remove email account",
+      );
+    }
+
+    return encodedRedirect(
+      "success",
+      "/dashboard",
+      "Email account and all associated brand deals removed successfully",
+    );
+  } catch (error) {
+    console.log("Unexpected error during email account deletion:", error);
     return encodedRedirect(
       "error",
       "/dashboard",
-      "Failed to remove email account",
+      "An unexpected error occurred while removing the email account",
     );
   }
-
-  return encodedRedirect(
-    "success",
-    "/dashboard",
-    "Email account removed successfully",
-  );
 };
 
 export const getUserEmailAccounts = async (userId: string) => {
