@@ -717,7 +717,9 @@ export const scanEmailsForBrandDeals = async (accountId: string) => {
   let activeDealsCount = await getUserActiveDealsCount(user.id);
 
   if (limits.activeDeals !== -1 && activeDealsCount >= limits.activeDeals) {
-    throw new Error(
+    return encodedRedirect(
+      "error",
+      "/dashboard",
       `Your ${tier} plan allows only ${limits.activeDeals} active deals. Upgrade to scan more.`,
     );
   }
@@ -773,7 +775,7 @@ export const scanEmailsForBrandDeals = async (accountId: string) => {
           limits.activeDeals !== -1 &&
           activeDealsCount >= limits.activeDeals
         ) {
-          console.lgo("Deal limit reached - stopped scanning");
+          console.log("Deal limit reached - stopped scanning");
           break;
         }
 
