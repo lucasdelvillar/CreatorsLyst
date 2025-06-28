@@ -710,6 +710,18 @@ export const scanEmailsForBrandDeals = async (accountId: string) => {
     throw new Error("User not authenticated");
   }
 
+  // Get subscription tier limits
+  const tier = await getSubscriptionLimits(user.id);
+  const limits = await getSubscriptionLimits(tier);
+
+  let activeDealsCount = await getUserActiveDealsCount(user.id);
+
+  if (limits.activeDeals !== -1 && activeDealsCount >= limits.activeDeals) {
+    throw new Error(
+      `Your ${tier} plan allows only ${limits.activeDeals} active deals. Upgrade to scan more.`,
+    );
+  }
+
   // Get the email account
   const { data: account, error: accountError } = await supabase
     .from("email_accounts")
@@ -756,6 +768,14 @@ export const scanEmailsForBrandDeals = async (accountId: string) => {
         );
 
         if (!messageResponse.ok) continue;
+
+        if (
+          limits.activeDeals !== -1 &&
+          activeDealsCount >= limits.activeDeals
+        ) {
+          console.lgo("Deal limit reached - stopped scanning");
+          break;
+        }
 
         const messageData = await messageResponse.json();
         const headers = messageData.payload.headers;
@@ -856,6 +876,8 @@ export const scanEmailsForBrandDeals = async (accountId: string) => {
 
         if (insertError) {
           console.log("Error inserting brand deal:", insertError);
+        } else {
+          activeDealsCount++;
         }
       } catch (messageError) {
         console.log("Error processing message:", messageError);
