@@ -650,22 +650,33 @@ export const handleGmailCallback = async (code: string, state: string) => {
 
     console.log("=== SUCCESS ===");
     console.log("Gmail account connected successfully for account:", accountId);
+
+    // Trigger email scanning after successful connection
+    try {
+      await scanEmailsForBrandDeals(accountId);
+    } catch (scanError) {
+      console.log("Warning: Email scanning failed:", scanError);
+      // Don't fail the connection if scanning fails
+    }
+
     return encodedRedirect(
       "success",
       "/dashboard",
-      "Gmail account connected successfully!",
+      "Gmail account connected successfully! Scanning for brand deals...",
     );
   } catch (error) {
-    console.log("=== FINAL ERROR ===");
-    console.log("Error type:", typeof error);
-    console.log(
-      "Error message:",
-      error instanceof Error ? error.message : String(error),
-    );
-    console.log(
-      "Error stack:",
-      error instanceof Error ? error.stack : "No stack trace",
-    );
+    // this will also catch NEXT_REDIRECT which isn't an actual error
+    // I can safely ignore that error
+    // console.log("=== FINAL ERROR ===");
+    // console.log("Error type:", typeof error);
+    // console.log(
+    //   "Error message:",
+    //   error instanceof Error ? error.message : String(error),
+    // );
+    // console.log(
+    //   "Error stack:",
+    //   error instanceof Error ? error.stack : "No stack trace",
+    // );
 
     return encodedRedirect(
       "error",
@@ -673,4 +684,233 @@ export const handleGmailCallback = async (code: string, state: string) => {
       `Failed to connect Gmail account: ${error instanceof Error ? error.message : "Unknown error"}`,
     );
   }
+};
+
+export const scanEmailsForBrandDeals = async (accountId: string) => {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    throw new Error("User not authenticated");
+  }
+
+  // Get the email account
+  const { data: account, error: accountError } = await supabase
+    .from("email_accounts")
+    .select("*")
+    .eq("id", accountId)
+    .eq("user_id", user.id)
+    .single();
+
+  if (accountError || !account || !account.access_token) {
+    throw new Error("Email account not found or not connected");
+  }
+
+  try {
+    // Fetch emails from Gmail API
+    const gmailResponse = await fetch(
+      "https://gmail.googleapis.com/gmail/v1/users/me/messages?q=from:(brand OR marketing OR collaboration OR sponsor OR partnership) OR subject:(brand OR collaboration OR sponsor OR partnership OR deal OR campaign)",
+      {
+        headers: {
+          Authorization: `Bearer ${account.access_token}`,
+        },
+      },
+    );
+
+    if (!gmailResponse.ok) {
+      throw new Error(`Gmail API error: ${gmailResponse.statusText}`);
+    }
+
+    const gmailData = await gmailResponse.json();
+    const messages = gmailData.messages || [];
+
+    // Process up to 20 recent emails to avoid overwhelming the system
+    const messagesToProcess = messages.slice(0, 20);
+
+    for (const message of messagesToProcess) {
+      try {
+        // Get full message details
+        const messageResponse = await fetch(
+          `https://gmail.googleapis.com/gmail/v1/users/me/messages/${message.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${account.access_token}`,
+            },
+          },
+        );
+
+        if (!messageResponse.ok) continue;
+
+        const messageData = await messageResponse.json();
+        const headers = messageData.payload.headers;
+
+        const subject =
+          headers.find((h: any) => h.name === "Subject")?.value || "";
+        const from = headers.find((h: any) => h.name === "From")?.value || "";
+        const date = headers.find((h: any) => h.name === "Date")?.value || "";
+
+        // Extract email address from "Name <email@domain.com>" format
+        const emailMatch =
+          from.match(/<([^>]+)>/) || from.match(/([\w.-]+@[\w.-]+\.[\w]+)/);
+        const senderEmail = emailMatch ? emailMatch[1] : from;
+
+        // Extract brand name (simple heuristic)
+        const brandName =
+          from.split("<")[0].trim() || senderEmail.split("@")[0];
+
+        // Get email body
+        let emailBody = "";
+        if (messageData.payload.body?.data) {
+          emailBody = Buffer.from(
+            messageData.payload.body.data,
+            "base64",
+          ).toString();
+        } else if (messageData.payload.parts) {
+          // Handle multipart messages
+          const textPart = messageData.payload.parts.find(
+            (part: any) =>
+              part.mimeType === "text/plain" || part.mimeType === "text/html",
+          );
+          if (textPart?.body?.data) {
+            emailBody = Buffer.from(textPart.body.data, "base64").toString();
+          }
+        }
+
+        // Simple brand deal detection logic
+        const brandKeywords = [
+          "collaboration",
+          "partnership",
+          "sponsor",
+          "brand deal",
+          "campaign",
+          "promote",
+          "marketing",
+          "influencer",
+          "content creator",
+          "ambassador",
+          "review",
+          "feature",
+          "showcase",
+          "compensation",
+        ];
+
+        const text = (subject + " " + emailBody).toLowerCase();
+        const isBrandDeal = brandKeywords.some((keyword) =>
+          text.includes(keyword),
+        );
+
+        if (!isBrandDeal) continue;
+
+        // Extract offer amount (simple regex)
+        const amountMatch = emailBody.match(/\$([0-9,]+(?:\.[0-9]{2})?)/g);
+        let offerAmount = null;
+        let currency = "USD";
+
+        if (amountMatch && amountMatch.length > 0) {
+          const amount = amountMatch[0].replace(/[$,]/g, "");
+          offerAmount = parseFloat(amount);
+        }
+
+        // Check if this deal already exists
+        const { data: existingDeal } = await supabase
+          .from("brand_deals")
+          .select("id")
+          .eq("email_id", message.id)
+          .eq("user_id", user.id)
+          .single();
+
+        if (existingDeal) continue; // Skip if already processed
+
+        // Insert brand deal
+        const { error: insertError } = await supabase
+          .from("brand_deals")
+          .insert({
+            user_id: user.id,
+            email_account_id: accountId,
+            email_id: message.id,
+            brand_name: brandName,
+            sender_email: senderEmail,
+            email_subject: subject,
+            email_body: emailBody.substring(0, 5000), // Limit body length
+            offer_amount: offerAmount,
+            currency: currency,
+            status: "pending",
+            deadline: null, // Could be extracted with more sophisticated parsing
+          });
+
+        if (insertError) {
+          console.log("Error inserting brand deal:", insertError);
+        }
+      } catch (messageError) {
+        console.log("Error processing message:", messageError);
+        continue;
+      }
+    }
+
+    return { success: true, processed: messagesToProcess.length };
+  } catch (error) {
+    console.log("Error scanning emails:", error);
+    throw error;
+  }
+};
+
+export const getUserBrandDeals = async (userId: string) => {
+  const supabase = await createClient();
+
+  const { data: deals, error } = await supabase
+    .from("brand_deals")
+    .select(
+      `
+      *,
+      email_accounts!inner(
+        email_address,
+        provider
+      )
+    `,
+    )
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.log("Error fetching brand deals:", error);
+    return [];
+  }
+
+  return deals || [];
+};
+
+export const updateBrandDealStatus = async (dealId: string, status: string) => {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return encodedRedirect("error", "/dashboard", "User not authenticated");
+  }
+
+  const { error } = await supabase
+    .from("brand_deals")
+    .update({
+      status,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", dealId)
+    .eq("user_id", user.id);
+
+  if (error) {
+    return encodedRedirect(
+      "error",
+      "/dashboard",
+      "Failed to update deal status",
+    );
+  }
+
+  return encodedRedirect(
+    "success",
+    "/dashboard",
+    "Deal status updated successfully",
+  );
 };

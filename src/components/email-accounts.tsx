@@ -11,6 +11,7 @@ import { Mail, Plus, CheckCircle, XCircle } from "lucide-react";
 import { AddEmailAccountDialog } from "./add-email-account-dialog";
 import RemoveEmailAccountButton from "./remove-email-account-button";
 import ConnectGmailButton from "./connect-gmail-button";
+import ScanEmailsButton from "./scan-emails-button";
 
 interface EmailAccount {
   id: string;
@@ -157,6 +158,10 @@ export default function EmailAccounts({
                       Connect (Coming Soon)
                     </Button>
                   )}
+                  <ScanEmailsButton
+                    accountId={account.id}
+                    isConnected={account.is_connected}
+                  />
                   <RemoveEmailAccountButton accountId={account.id} />
                 </div>
               </CardContent>
