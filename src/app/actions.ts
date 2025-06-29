@@ -373,10 +373,10 @@ export const removeEmailAccount = async (accountId: string) => {
   }
 
   // Revoke Google OAuth permissions if it's a Gmail account with an access token
-  if (account.provider === "gmail" && account.access_token) {
+  if (account.provider === "gmail" && account.refresh_token) {
     try {
       const revokeResponse = await fetch(
-        `https://oauth2.googleapis.com/revoke?token=${account.access_token}`,
+        `https://oauth2.googleapis.com/revoke?token=${account.refresh_token}`,
         {
           method: "POST",
           headers: {
