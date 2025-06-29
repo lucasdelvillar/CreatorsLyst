@@ -62,6 +62,7 @@ export default async function Dashboard() {
             activeDealsCount={activeDealsCount}
           />
 
+          {/* TODO: refactor to it's own component */}
           {/* Brand Deals Section */}
           {brandDeals.length > 0 && (
             <section className="space-y-6">
