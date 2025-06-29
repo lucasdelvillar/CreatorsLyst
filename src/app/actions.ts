@@ -952,3 +952,34 @@ export const updateBrandDealStatus = async (dealId: string, status: string) => {
     "Deal status updated successfully",
   );
 };
+
+export const removeBrandDeal = async (brandDealId: string) => {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return encodedRedirect("error", "/dashboard", "User not authenticated");
+  }
+
+  // Delete brand deal
+  const { error: brandDealError } = await supabase
+    .from("brand_deals")
+    .delete()
+    .eq("id", brandDealId);
+
+  if (error) {
+    return encodedRedirect(
+      "error",
+      "/dashboard",
+      "Failed to remove brand deal",
+    );
+  }
+
+  return encodedRedirect(
+    "success",
+    "/dashboard",
+    "Brand deal successfully removed",
+  );
+};
