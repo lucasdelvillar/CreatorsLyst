@@ -969,7 +969,7 @@ export const removeBrandDeal = async (brandDealId: string) => {
     .delete()
     .eq("id", brandDealId);
 
-  if (error) {
+  if (brandDealError) {
     return encodedRedirect(
       "error",
       "/dashboard",

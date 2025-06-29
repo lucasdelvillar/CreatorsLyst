@@ -1,5 +1,6 @@
 import DashboardNavbar from "@/components/dashboard-navbar";
 import EmailAccounts from "@/components/email-accounts";
+import RemoveBrandDeal from "@/components/remove-brand-deal-button";
 import { createClient } from "../../../supabase/server";
 import { InfoIcon, UserCircle } from "lucide-react";
 import { redirect } from "next/navigation";
@@ -93,6 +94,7 @@ export default async function Dashboard() {
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Date
                         </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
@@ -139,6 +141,9 @@ export default async function Dashboard() {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             {new Date(deal.created_at).toLocaleDateString()}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <RemoveBrandDeal brandDealId={deal.id} />
                           </td>
                         </tr>
                       ))}
