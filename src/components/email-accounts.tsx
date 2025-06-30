@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   Card,
   CardContent,
@@ -189,7 +190,9 @@ export default function EmailAccounts({
                 </p>
               </div>
               <Button variant="outline" className="ml-auto">
-                Upgrade Plan
+                <Link href="/pricing" prefetch className="">
+                  Upgrade Plan
+                </Link>
               </Button>
             </div>
           </CardContent>
