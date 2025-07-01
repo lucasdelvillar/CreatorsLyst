@@ -11,6 +11,9 @@ export default async function Pricing() {
   const { data: plans, error } = await supabase.functions.invoke(
     "supabase-functions-get-plans",
   );
+
+  const sortedPlans = plans?.sort((a: any, b: any) => a.amount - b.amount);
+
   return (
     <>
       <Navbar />
@@ -25,7 +28,7 @@ export default async function Pricing() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto">
-          {plans?.map((item: any) => (
+          {sortedPlans?.map((item: any) => (
             <PricingCard key={item.id} item={item} user={user} />
           ))}
         </div>
