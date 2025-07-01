@@ -27,7 +27,11 @@ export default function DashboardNavbar() {
         <div className="flex gap-4 items-center">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="focus:outline-none focus:ring-0 focus-visible:ring-0"
+              >
                 <UserCircle className="h-6 w-6" />
               </Button>
             </DropdownMenuTrigger>

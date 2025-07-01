@@ -1,8 +1,16 @@
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+
 import DashboardNavbar from "@/components/dashboard-navbar";
 import EmailAccounts from "@/components/email-accounts";
 import RemoveBrandDeal from "@/components/remove-brand-deal-button";
 import { createClient } from "../../../supabase/server";
-import { InfoIcon, UserCircle } from "lucide-react";
+import { InfoIcon, UserCircle, Home, Ellipsis } from "lucide-react";
 import { redirect } from "next/navigation";
 import { SubscriptionCheck } from "@/components/subscription-check";
 import {
@@ -144,7 +152,25 @@ export default async function Dashboard() {
                             {new Date(deal.created_at).toLocaleDateString()}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <RemoveBrandDeal brandDealId={deal.id} />
+                            <div className="flex gap-4 items-center">
+                              {/* TODO: Refactor into own component*/}
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="focus:outline-none focus:ring-0 focus-visible:ring-0"
+                                  >
+                                    <Ellipsis className="h-5 w-5" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="center">
+                                  <DropdownMenuItem>
+                                    <RemoveBrandDeal brandDealId={deal.id} />
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </div>
                           </td>
                         </tr>
                       ))}

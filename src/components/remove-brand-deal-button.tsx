@@ -22,13 +22,16 @@ export default function RemoveBrandDealButton({
 
   return (
     <Button
-      variant="outline"
+      variant="ghost"
       size="sm"
       onClick={handleRemove}
       disabled={isRemoving}
-      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+      className="text-red-600 hover:text-red-700 "
     >
-      <Trash2 className="h-4 w-4" />
+      <div className="flex gap-2 items-center">
+        <Trash2 className="h-4 w-4" />
+        Delete
+      </div>
     </Button>
   );
 }
