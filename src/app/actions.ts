@@ -700,7 +700,9 @@ export const handleGmailCallback = async (code: string, state: string) => {
   }
 };
 
-export const scanEmailsForBrandDeals = async (accountId: string) => {
+export const scanEmailsForBrandDeals = async (formData: FormData) => {
+  const accountId = formData.get("accountId") as string;
+
   const supabase = await createClient();
   const {
     data: { user },
@@ -732,9 +734,13 @@ export const scanEmailsForBrandDeals = async (accountId: string) => {
     .eq("user_id", user.id)
     .single();
 
-  if (accountError || !account || !account.access_token) {
+  if (accountError || !account || !account.refresh_token) {
     throw new Error("Email account not found or not connected");
   }
+
+  const accessToken = await getAccessTokenFromRefreshToken(
+    account.refresh_token,
+  );
 
   try {
     // Fetch emails from Gmail API
@@ -742,7 +748,7 @@ export const scanEmailsForBrandDeals = async (accountId: string) => {
       "https://gmail.googleapis.com/gmail/v1/users/me/messages?q=from:(brand OR marketing OR collaboration OR sponsor OR partnership) OR subject:(brand OR collaboration OR sponsor OR partnership OR deal OR campaign)",
       {
         headers: {
-          Authorization: `Bearer ${account.access_token}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       },
     );
@@ -751,6 +757,7 @@ export const scanEmailsForBrandDeals = async (accountId: string) => {
       throw new Error(`Gmail API error: ${gmailResponse.statusText}`);
     }
 
+    console.log("fetched emails sucessfully"); // DEBUG statement
     const gmailData = await gmailResponse.json();
     const messages = gmailData.messages || [];
 
@@ -764,7 +771,7 @@ export const scanEmailsForBrandDeals = async (accountId: string) => {
           `https://gmail.googleapis.com/gmail/v1/users/me/messages/${message.id}`,
           {
             headers: {
-              Authorization: `Bearer ${account.access_token}`,
+              Authorization: `Bearer ${account.accessToken}`,
             },
           },
         );
@@ -887,6 +894,8 @@ export const scanEmailsForBrandDeals = async (accountId: string) => {
       }
     }
 
+    console.log("parsed sucessfully"); // DEBUG statement
+
     return { success: true, processed: messagesToProcess.length };
   } catch (error) {
     console.log("Error scanning emails:", error);
@@ -983,3 +992,26 @@ export const removeBrandDeal = async (brandDealId: string) => {
     "Brand deal successfully removed",
   );
 };
+
+// Helper functions to get access token
+async function getAccessTokenFromRefreshToken(refreshToken: string) {
+  const response = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: new URLSearchParams({
+      client_id: process.env.GOOGLE_CLIENT_ID!,
+      client_secret: process.env.GOOGLE_CLIENT_SECRET!,
+      refresh_token: refreshToken,
+      grant_type: "refresh_token",
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to refresh access token");
+  }
+
+  const data = await response.json();
+  return data.access_token;
+}
