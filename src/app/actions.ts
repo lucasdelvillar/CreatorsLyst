@@ -700,9 +700,7 @@ export const handleGmailCallback = async (code: string, state: string) => {
   }
 };
 
-export const scanEmailsForBrandDeals = async (formData: FormData) => {
-  const accountId = formData.get("accountId") as string;
-
+export const scanEmailsForBrandDeals = async (accountId: string) => {
   const supabase = await createClient();
   const {
     data: { user },
