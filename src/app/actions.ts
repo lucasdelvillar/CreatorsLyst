@@ -991,6 +991,69 @@ export const removeBrandDeal = async (brandDealId: string) => {
   );
 };
 
+export const updateBrandDeal = async (
+  brandDealId: string,
+  formData: FormData,
+) => {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return encodedRedirect("error", "/dashboard", "User not authenticated");
+  }
+
+  const brandName = formData.get("brand_name")?.toString();
+  const senderEmail = formData.get("sender_email")?.toString();
+  const emailSubject = formData.get("email_subject")?.toString();
+  const emailBody = formData.get("email_body")?.toString();
+  const offerAmountStr = formData.get("offer_amount")?.toString();
+  const currency = formData.get("currency")?.toString();
+  const status = formData.get("status")?.toString();
+  const deadline = formData.get("deadline")?.toString();
+
+  if (!brandName || !senderEmail || !emailSubject) {
+    return encodedRedirect(
+      "error",
+      "/dashboard",
+      "Brand name, sender email, and email subject are required",
+    );
+  }
+
+  const offerAmount = offerAmountStr ? parseFloat(offerAmountStr) : null;
+
+  const { error } = await supabase
+    .from("brand_deals")
+    .update({
+      brand_name: brandName,
+      sender_email: senderEmail,
+      email_subject: emailSubject,
+      email_body: emailBody || "",
+      offer_amount: offerAmount,
+      currency: currency || "USD",
+      status: status || "pending",
+      deadline: deadline || null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", brandDealId)
+    .eq("user_id", user.id);
+
+  if (error) {
+    return encodedRedirect(
+      "error",
+      "/dashboard",
+      "Failed to update brand deal",
+    );
+  }
+
+  return encodedRedirect(
+    "success",
+    "/dashboard",
+    "Brand deal updated successfully",
+  );
+};
+
 // Helper functions to get access token
 async function getAccessTokenFromRefreshToken(refreshToken: string) {
   const response = await fetch("https://oauth2.googleapis.com/token", {
