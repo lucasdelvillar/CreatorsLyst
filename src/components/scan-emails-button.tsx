@@ -22,9 +22,11 @@ export default function ScanEmailsButton({
     startTransition(async () => {
       try {
         await scanEmailsForBrandDeals(accountId);
-        router.refresh(); // Refresh the page to show new deals
+        router.refresh();
       } catch (error) {
         console.error("Error scanning emails:", error);
+        // Still refresh on error to show any partial results
+        router.refresh();
       }
     });
   };

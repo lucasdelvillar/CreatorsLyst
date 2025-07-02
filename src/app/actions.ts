@@ -769,7 +769,7 @@ export const scanEmailsForBrandDeals = async (accountId: string) => {
           `https://gmail.googleapis.com/gmail/v1/users/me/messages/${message.id}`,
           {
             headers: {
-              Authorization: `Bearer ${account.accessToken}`,
+              Authorization: `Bearer ${accessToken}`,
             },
           },
         );
