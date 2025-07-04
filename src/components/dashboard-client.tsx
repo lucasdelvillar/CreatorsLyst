@@ -149,6 +149,7 @@ export default function DashboardClient({
                                     year: "numeric",
                                     month: "numeric",
                                     day: "numeric",
+                                    timeZone: "UTC",
                                   },
                                 )
                               : new Date(deal.created_at).toLocaleDateString(
@@ -157,6 +158,7 @@ export default function DashboardClient({
                                     year: "numeric",
                                     month: "numeric",
                                     day: "numeric",
+                                    timeZone: "UTC",
                                   },
                                 )}
                           </td>
