@@ -143,8 +143,12 @@ export default function DashboardClient({
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             {deal.deadline
-                              ? new Date(deal.deadline).toLocaleDateString()
-                              : new Date(deal.created_at).toLocaleDateString()}
+                              ? new Date(deal.deadline).toLocaleDateString(
+                                  "en-US",
+                                )
+                              : new Date(deal.created_at).toLocaleDateString(
+                                  "en-US",
+                                )}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex gap-4 items-center">
