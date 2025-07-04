@@ -736,14 +736,32 @@ export const scanEmailsForBrandDeals = async (accountId: string) => {
     throw new Error("Email account not found or not connected");
   }
 
+  // Get the last scan timestamp to only scan new emails
+  const { data: lastScanData } = await supabase
+    .from("brand_deals")
+    .select("created_at")
+    .eq("email_account_id", accountId)
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .single();
+
+  // Calculate date filter for Gmail API (only scan emails from last scan or last 7 days)
+  const lastScanDate = lastScanData?.created_at
+    ? new Date(lastScanData.created_at)
+    : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000); // 30 days ago as fallback
+
+  const afterTimestamp = Math.floor(lastScanDate.getTime() / 1000);
+
   const accessToken = await getAccessTokenFromRefreshToken(
     account.refresh_token,
   );
 
   try {
-    // Fetch emails from Gmail API
+    // Fetch emails from Gmail API with date filter to only get new emails
+    const query = `(from:(brand OR marketing OR collaboration OR sponsor OR partnership) OR subject:(brand OR collaboration OR sponsor OR partnership OR deal OR campaign)) after:${afterTimestamp}`;
     const gmailResponse = await fetch(
-      "https://gmail.googleapis.com/gmail/v1/users/me/messages?q=from:(brand OR marketing OR collaboration OR sponsor OR partnership) OR subject:(brand OR collaboration OR sponsor OR partnership OR deal OR campaign)",
+      `https://gmail.googleapis.com/gmail/v1/users/me/messages?q=${encodeURIComponent(query)}`,
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -759,8 +777,10 @@ export const scanEmailsForBrandDeals = async (accountId: string) => {
     const gmailData = await gmailResponse.json();
     const messages = gmailData.messages || [];
 
-    // Process up to 20 recent emails to avoid overwhelming the system
-    const messagesToProcess = messages.slice(0, 20);
+    console.log(`Found ${messages.length} new emails since last scan`);
+
+    // Process up to 50 recent emails since we're only getting new ones
+    const messagesToProcess = messages.slice(0, 50);
 
     for (const message of messagesToProcess) {
       try {
@@ -893,6 +913,13 @@ export const scanEmailsForBrandDeals = async (accountId: string) => {
     }
 
     console.log("parsed sucessfully"); // DEBUG statement
+
+    // Update the email account's last_scanned timestamp
+    await supabase
+      .from("email_accounts")
+      .update({ updated_at: new Date().toISOString() })
+      .eq("id", accountId)
+      .eq("user_id", user.id);
 
     return { success: true, processed: messagesToProcess.length };
   } catch (error) {

@@ -145,9 +145,19 @@ export default function DashboardClient({
                             {deal.deadline
                               ? new Date(deal.deadline).toLocaleDateString(
                                   "en-US",
+                                  {
+                                    year: "numeric",
+                                    month: "numeric",
+                                    day: "numeric",
+                                  },
                                 )
                               : new Date(deal.created_at).toLocaleDateString(
                                   "en-US",
+                                  {
+                                    year: "numeric",
+                                    month: "numeric",
+                                    day: "numeric",
+                                  },
                                 )}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
