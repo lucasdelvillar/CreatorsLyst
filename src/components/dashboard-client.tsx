@@ -14,6 +14,8 @@ import EmailAccounts from "@/components/email-accounts";
 import RemoveBrandDeal from "@/components/remove-brand-deal-button";
 import EditBrandDealButton from "@/components/edit-brand-deal-button";
 import EditBrandDealDialog from "@/components/edit-brand-deal-dialog";
+import ReadWriteNotesButton from "@/components/read-write-notes-button";
+import ReadWriteNotesDialog from "@/components/read-write-notes-dialog";
 import { Ellipsis } from "lucide-react";
 
 interface DashboardClientProps {
@@ -36,9 +38,18 @@ export default function DashboardClient({
   const [editingDeal, setEditingDeal] = useState<any>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
+  const [readWriteNotes, setReadWriteNotes] = useState<any>(null);
+  const [isNoteDialogOpen, setIsNoteDialogOpen] = useState(false);
+
   const handleEditDeal = (deal: any) => {
     setEditingDeal(deal);
     setIsEditDialogOpen(true);
+  };
+
+  const handleNotes = (note: any) => {
+    console.log(note);
+    setReadWriteNotes(note);
+    setIsNoteDialogOpen(true);
   };
 
   return (
@@ -176,6 +187,16 @@ export default function DashboardClient({
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="center">
                                   <DropdownMenuItem>
+                                    <ReadWriteNotesButton
+                                      onClick={() =>
+                                        handleNotes({
+                                          id: "123",
+                                          note_subject: "test",
+                                        })
+                                      }
+                                    />
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem>
                                     <EditBrandDealButton
                                       onClick={() => handleEditDeal(deal)}
                                     />
@@ -203,6 +224,15 @@ export default function DashboardClient({
             brandDeal={editingDeal}
             open={isEditDialogOpen}
             onOpenChange={setIsEditDialogOpen}
+          />
+        )}
+
+        {/* Notes Dialog */}
+        {readWriteNotes && (
+          <ReadWriteNotesDialog
+            note={readWriteNotes} // this is empty right now?
+            open={isNoteDialogOpen}
+            onOpenChange={setIsNoteDialogOpen}
           />
         )}
       </main>
