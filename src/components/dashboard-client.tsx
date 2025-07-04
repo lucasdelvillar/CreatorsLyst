@@ -14,8 +14,8 @@ import EmailAccounts from "@/components/email-accounts";
 import RemoveBrandDeal from "@/components/remove-brand-deal-button";
 import EditBrandDealButton from "@/components/edit-brand-deal-button";
 import EditBrandDealDialog from "@/components/edit-brand-deal-dialog";
-import ReadWriteNotesButton from "@/components/read-write-notes-button";
-import ReadWriteNotesDialog from "@/components/read-write-notes-dialog";
+import NotesButton from "@/components/read-write-notes-button";
+import NotesDialog from "@/components/read-write-notes-dialog";
 import { Ellipsis } from "lucide-react";
 
 interface DashboardClientProps {
@@ -38,7 +38,7 @@ export default function DashboardClient({
   const [editingDeal, setEditingDeal] = useState<any>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
-  const [readWriteNotes, setReadWriteNotes] = useState<any>(null);
+  const [editingNotes, setEditingNotes] = useState<any>(null);
   const [isNoteDialogOpen, setIsNoteDialogOpen] = useState(false);
 
   const handleEditDeal = (deal: any) => {
@@ -47,7 +47,7 @@ export default function DashboardClient({
   };
 
   const handleNote = (deal: any) => {
-    setReadWriteNotes(deal);
+    setEditingNotes(deal);
     setIsNoteDialogOpen(true);
   };
 
@@ -186,7 +186,7 @@ export default function DashboardClient({
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="center">
                                   <DropdownMenuItem>
-                                    <ReadWriteNotesButton
+                                    <NotesButton
                                       onClick={() => handleNote(deal)}
                                     />
                                   </DropdownMenuItem>
@@ -222,9 +222,9 @@ export default function DashboardClient({
         )}
 
         {/* Notes Dialog */}
-        {readWriteNotes && (
-          <ReadWriteNotesDialog
-            brandDeal={readWriteNotes}
+        {editingNotes && (
+          <NotesDialog
+            brandDeal={editingNotes}
             open={isNoteDialogOpen}
             onOpenChange={setIsNoteDialogOpen}
           />

@@ -3,13 +3,11 @@
 import { Button } from "@/components/ui/button";
 import { StickyNote } from "lucide-react";
 
-interface ReadWriteNotesButtonProps {
+interface NotesButtonProps {
   onClick: () => void;
 }
 
-export default function ReadWriteNotesButton({
-  onClick,
-}: ReadWriteNotesButtonProps) {
+export default function NotesButton({ onClick }: NotesButtonProps) {
   return (
     <Button
       variant="ghost"

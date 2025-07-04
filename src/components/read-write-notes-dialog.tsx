@@ -34,17 +34,17 @@ interface BrandDeal {
   deadline: string | null;
 }
 
-interface ReadWriteNoteDialogProps {
+interface NoteDialogProps {
   brandDeal: BrandDeal;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export default function ReadWriteNoteDialog({
+export default function NoteDialog({
   brandDeal,
   open,
   onOpenChange,
-}: ReadWriteNoteDialogProps) {
+}: NoteDialogProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [formData, setFormData] = useState({
