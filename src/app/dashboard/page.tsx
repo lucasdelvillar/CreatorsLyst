@@ -35,6 +35,7 @@ export default async function Dashboard() {
   // DEBUG
   //console.log(emailAccounts);
   //console.log(activeDealsCount);
+  console.log(brandDeals);
 
   return (
     <SubscriptionCheck>

@@ -46,9 +46,8 @@ export default function DashboardClient({
     setIsEditDialogOpen(true);
   };
 
-  const handleNotes = (note: any) => {
-    console.log(note);
-    setReadWriteNotes(note);
+  const handleNote = (deal: any) => {
+    setReadWriteNotes(deal);
     setIsNoteDialogOpen(true);
   };
 
@@ -188,12 +187,7 @@ export default function DashboardClient({
                                 <DropdownMenuContent align="center">
                                   <DropdownMenuItem>
                                     <ReadWriteNotesButton
-                                      onClick={() =>
-                                        handleNotes({
-                                          id: "123",
-                                          note_subject: "test",
-                                        })
-                                      }
+                                      onClick={() => handleNote(deal)}
                                     />
                                   </DropdownMenuItem>
                                   <DropdownMenuItem>
@@ -230,7 +224,7 @@ export default function DashboardClient({
         {/* Notes Dialog */}
         {readWriteNotes && (
           <ReadWriteNotesDialog
-            note={readWriteNotes} // this is empty right now?
+            brandDeal={readWriteNotes}
             open={isNoteDialogOpen}
             onOpenChange={setIsNoteDialogOpen}
           />

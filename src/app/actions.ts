@@ -1081,6 +1081,33 @@ export const updateBrandDeal = async (
   );
 };
 
+export const updateNote = async (brandDealId: string, formData: FormData) => {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return encodedRedirect("error", "/dashboard", "User not authenticated");
+  }
+
+  const noteSubject = formData.get("note_subject")?.toString();
+
+  const { error } = await supabase
+    .from("brand_deals")
+    .update({
+      note_subject: noteSubject,
+    })
+    .eq("id", brandDealId)
+    .eq("user_id", user.id);
+
+  if (error) {
+    return encodedRedirect("error", "/dashboard", "Failed to update note");
+  }
+
+  return encodedRedirect("success", "/dashboard", "Note updated successfully");
+};
+
 // Helper functions to get access token
 async function getAccessTokenFromRefreshToken(refreshToken: string) {
   const response = await fetch("https://oauth2.googleapis.com/token", {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useEffect, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,30 +19,43 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { updateBrandDeal } from "@/app/actions"; // will need to define function for updating notes
+import { updateNote } from "@/app/actions";
 import { useRouter } from "next/navigation";
 
-interface Note {
+interface BrandDeal {
   id: string;
-  note_subject: string;
+  brand_name: string;
+  sender_email: string;
+  email_subject: string;
+  note_subject: string | null;
+  offer_amount: number | null;
+  currency: string;
+  status: string;
+  deadline: string | null;
 }
 
 interface ReadWriteNoteDialogProps {
-  note: Note;
+  brandDeal: BrandDeal;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
 export default function ReadWriteNoteDialog({
-  note,
+  brandDeal,
   open,
   onOpenChange,
 }: ReadWriteNoteDialogProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [formData, setFormData] = useState({
-    note_subject: note.note_subject || "",
+    note_subject: brandDeal.note_subject || "",
   });
+
+  useEffect(() => {
+    setFormData({
+      note_subject: brandDeal.note_subject || "",
+    });
+  }, [brandDeal.note_subject, open]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,7 +64,7 @@ export default function ReadWriteNoteDialog({
       const formDataObj = new FormData();
       formDataObj.append("note_subject", formData.note_subject);
 
-      // TODO: change to updateNote()
+      await updateNote(brandDeal.id, formDataObj);
       onOpenChange(false);
       router.refresh();
     });

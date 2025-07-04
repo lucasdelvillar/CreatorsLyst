@@ -26,6 +26,7 @@ interface BrandDeal {
   brand_name: string;
   sender_email: string;
   email_subject: string;
+  note_subject: string | null;
   offer_amount: number | null;
   currency: string;
   status: string;
