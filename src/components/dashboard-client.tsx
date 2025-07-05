@@ -34,15 +34,13 @@ export default function DashboardClient({
   limits,
   emailAccounts,
   activeDealsCount,
-  brandDeals: initialBrandDeals,
+  brandDeals,
 }: DashboardClientProps) {
   const [editingDeal, setEditingDeal] = useState<any>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   const [editingNotes, setEditingNotes] = useState<any>(null);
   const [isNoteDialogOpen, setIsNoteDialogOpen] = useState(false);
-
-  const [brandDeals, setBrandDeals] = useState(initialBrandDeals);
 
   const handleEditDeal = (deal: any) => {
     setEditingDeal(deal);
@@ -88,10 +86,7 @@ export default function DashboardClient({
                   Manage your brand collaboration opportunities
                 </p>
               </div>
-              <AddBrandDealDialog
-                emailAccounts={emailAccounts}
-                onAdd={(newDeal) => setBrandDeals((prev) => [newDeal, ...prev])}
-              >
+              <AddBrandDealDialog emailAccounts={emailAccounts}>
                 <Button className="flex items-center gap-2">
                   <Plus className="h-4 w-4" />
                   Add Brand Deal
@@ -235,10 +230,7 @@ export default function DashboardClient({
                     Start by connecting your email accounts to automatically
                     scan for deals, or add one manually.
                   </p>
-                  <AddBrandDealDialog
-                    emailAccounts={emailAccounts}
-                    onAdd={(newDeal) => setDeals((prev) => [newDeal, ...prev])}
-                  >
+                  <AddBrandDealDialog emailAccounts={emailAccounts}>
                     <Button>
                       <Plus className="h-4 w-4 mr-2" />
                       Add Your First Brand Deal

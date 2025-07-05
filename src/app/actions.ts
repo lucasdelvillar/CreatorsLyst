@@ -936,7 +936,7 @@ export const getUserBrandDeals = async (userId: string) => {
     .select(
       `
       *,
-      email_accounts!inner(
+      email_accounts(
         email_address,
         provider
       )
@@ -1191,7 +1191,11 @@ export const addBrandDeal = async (formData: FormData) => {
     return encodedRedirect("error", "/dashboard", "Failed to add brand deal");
   }
 
-  return data; // instead of redirect to update UI
+  return encodedRedirect(
+    "success",
+    "/dashboard",
+    "Brand deal added successfully",
+  );
 };
 
 // Helper functions to get access token

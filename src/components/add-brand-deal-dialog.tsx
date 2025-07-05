@@ -66,8 +66,7 @@ export function AddBrandDealDialog({
       formDataObj.append("deadline", formData.deadline);
       formDataObj.append("email_account_id", formData.email_account_id);
 
-      const newDeal = await addBrandDeal(formDataObj);
-      onAdd?.(newDeal); // invoke parent callback
+      await addBrandDeal(formDataObj);
       setOpen(false);
       setFormData({
         brand_name: "",
@@ -80,6 +79,7 @@ export function AddBrandDealDialog({
         deadline: "",
         email_account_id: "",
       });
+      router.refresh();
     });
   };
 
