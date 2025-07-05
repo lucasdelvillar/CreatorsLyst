@@ -16,7 +16,8 @@ import EditBrandDealButton from "@/components/edit-brand-deal-button";
 import EditBrandDealDialog from "@/components/edit-brand-deal-dialog";
 import NotesButton from "@/components/read-write-notes-button";
 import NotesDialog from "@/components/read-write-notes-dialog";
-import { Ellipsis } from "lucide-react";
+import { AddBrandDealDialog } from "@/components/add-brand-deal-dialog";
+import { Ellipsis, Plus } from "lucide-react";
 
 interface DashboardClientProps {
   user: any;
@@ -33,13 +34,15 @@ export default function DashboardClient({
   limits,
   emailAccounts,
   activeDealsCount,
-  brandDeals,
+  brandDeals: initialBrandDeals,
 }: DashboardClientProps) {
   const [editingDeal, setEditingDeal] = useState<any>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   const [editingNotes, setEditingNotes] = useState<any>(null);
   const [isNoteDialogOpen, setIsNoteDialogOpen] = useState(false);
+
+  const [brandDeals, setBrandDeals] = useState(initialBrandDeals);
 
   const handleEditDeal = (deal: any) => {
     setEditingDeal(deal);
@@ -75,8 +78,8 @@ export default function DashboardClient({
           />
 
           {/* Brand Deals Section */}
-          {brandDeals.length > 0 && (
-            <section className="space-y-6">
+          <section className="space-y-6">
+            <div className="flex justify-between items-start">
               <div>
                 <h2 className="text-2xl font-bold text-gray-900">
                   Brand Deals
@@ -85,7 +88,18 @@ export default function DashboardClient({
                   Manage your brand collaboration opportunities
                 </p>
               </div>
+              <AddBrandDealDialog
+                emailAccounts={emailAccounts}
+                onAdd={(newDeal) => setBrandDeals((prev) => [newDeal, ...prev])}
+              >
+                <Button className="flex items-center gap-2">
+                  <Plus className="h-4 w-4" />
+                  Add Brand Deal
+                </Button>
+              </AddBrandDealDialog>
+            </div>
 
+            {brandDeals.length > 0 ? (
               <div className="bg-white rounded-lg shadow overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="min-w-full divide-y divide-gray-200">
@@ -208,8 +222,32 @@ export default function DashboardClient({
                   </table>
                 </div>
               </div>
-            </section>
-          )}
+            ) : (
+              <div className="bg-white rounded-lg shadow p-12 text-center">
+                <div className="max-w-md mx-auto">
+                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Plus className="h-8 w-8 text-gray-400" />
+                  </div>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    No brand deals yet
+                  </h3>
+                  <p className="text-gray-600 mb-6">
+                    Start by connecting your email accounts to automatically
+                    scan for deals, or add one manually.
+                  </p>
+                  <AddBrandDealDialog
+                    emailAccounts={emailAccounts}
+                    onAdd={(newDeal) => setDeals((prev) => [newDeal, ...prev])}
+                  >
+                    <Button>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Your First Brand Deal
+                    </Button>
+                  </AddBrandDealDialog>
+                </div>
+              </div>
+            )}
+          </section>
         </div>
 
         {/* Edit Brand Deal Dialog */}

@@ -291,7 +291,7 @@ export const addEmailAccount = async (formData: FormData) => {
 
   // Check subscription limits
   const tier = await getUserSubscriptionTier(user.id);
-  const limits = getSubscriptionLimits(tier);
+  const limits = await getSubscriptionLimits(tier);
 
   if (limits.emailAccounts !== -1) {
     const { data: existingAccounts } = await supabase
@@ -711,7 +711,7 @@ export const scanEmailsForBrandDeals = async (accountId: string) => {
   }
 
   // Get subscription tier limits
-  const tier = await getSubscriptionLimits(user.id);
+  const tier = await getUserSubscriptionTier(user.id);
   const limits = await getSubscriptionLimits(tier);
 
   let activeDealsCount = await getUserActiveDealsCount(user.id);
@@ -759,7 +759,7 @@ export const scanEmailsForBrandDeals = async (accountId: string) => {
 
   try {
     // Fetch emails from Gmail API with date filter to only get new emails
-    const query = `(from:(brand OR marketing OR collaboration OR sponsor OR partnership) OR subject:(brand OR collaboration OR sponsor OR partnership OR deal OR campaign)) after:${afterTimestamp}`;
+    const query = afterTimestamp ? `after:${afterTimestamp}` : ""; // first-time scan = scan all
     const gmailResponse = await fetch(
       `https://gmail.googleapis.com/gmail/v1/users/me/messages?q=${encodeURIComponent(query)}`,
       {
@@ -1106,6 +1106,92 @@ export const updateNote = async (brandDealId: string, formData: FormData) => {
   }
 
   return encodedRedirect("success", "/dashboard", "Note updated successfully");
+};
+
+export const addBrandDeal = async (formData: FormData) => {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return encodedRedirect("error", "/dashboard", "User not authenticated");
+  }
+
+  const brandName = formData.get("brand_name")?.toString();
+  const senderEmail = formData.get("sender_email")?.toString();
+  const emailSubject = formData.get("email_subject")?.toString();
+  const noteSubject = formData.get("note_subject")?.toString();
+  const offerAmountStr = formData.get("offer_amount")?.toString();
+  const currency = formData.get("currency")?.toString();
+  const status = formData.get("status")?.toString();
+  const deadline = formData.get("deadline")?.toString();
+  const emailAccountId = formData.get("email_account_id")?.toString();
+
+  if (!brandName || !senderEmail || !emailSubject) {
+    return encodedRedirect(
+      "error",
+      "/dashboard",
+      "Brand name, contact email, and campaign subject are required",
+    );
+  }
+
+  // Check subscription limits
+  const tier = await getUserSubscriptionTier(user.id);
+  const limits = await getSubscriptionLimits(tier);
+  const activeDealsCount = await getUserActiveDealsCount(user.id);
+
+  if (limits.activeDeals !== -1 && activeDealsCount >= limits.activeDeals) {
+    return encodedRedirect(
+      "error",
+      "/dashboard",
+      `Your ${tier} plan allows only ${limits.activeDeals} active deals. Upgrade to add more.`,
+    );
+  }
+
+  const offerAmount = offerAmountStr ? parseFloat(offerAmountStr) : null;
+
+  // If email account ID is provided, verify it belongs to the user
+  if (emailAccountId) {
+    const { data: emailAccount, error: emailAccountError } = await supabase
+      .from("email_accounts")
+      .select("id")
+      .eq("id", emailAccountId)
+      .eq("user_id", user.id)
+      .single();
+
+    if (emailAccountError || !emailAccount) {
+      return encodedRedirect(
+        "error",
+        "/dashboard",
+        "Selected email account not found or doesn't belong to you",
+      );
+    }
+  }
+
+  const { data, error } = await supabase
+    .from("brand_deals")
+    .insert({
+      user_id: user.id,
+      email_account_id: emailAccountId || null,
+      email_id: null, // Manual entries don't have email IDs
+      brand_name: brandName,
+      sender_email: senderEmail,
+      email_subject: emailSubject,
+      note_subject: noteSubject || "",
+      offer_amount: offerAmount,
+      currency: currency || "USD",
+      status: status || "pending",
+      deadline: deadline || null,
+    })
+    .select()
+    .single();
+
+  if (error) {
+    return encodedRedirect("error", "/dashboard", "Failed to add brand deal");
+  }
+
+  return data; // instead of redirect to update UI
 };
 
 // Helper functions to get access token

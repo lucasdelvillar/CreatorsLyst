@@ -15,7 +15,7 @@ export type Database = {
           created_at: string;
           currency: string | null;
           deadline: string | null;
-          email_account_id: string;
+          email_account_id: string | null;
           email_body: string | null;
           email_id: string | null;
           email_subject: string | null;
@@ -32,7 +32,7 @@ export type Database = {
           created_at?: string;
           currency?: string | null;
           deadline?: string | null;
-          email_account_id: string;
+          email_account_id: string | null;
           email_body?: string | null;
           email_id?: string | null;
           email_subject?: string | null;
@@ -49,7 +49,7 @@ export type Database = {
           created_at?: string;
           currency?: string | null;
           deadline?: string | null;
-          email_account_id?: string;
+          email_account_id?: string | null;
           email_body?: string | null;
           email_id?: string | null;
           email_subject?: string | null;
