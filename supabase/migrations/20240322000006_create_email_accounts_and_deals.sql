@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS public.brand_deals (
     user_id text REFERENCES public.users(user_id) NOT NULL,
     email_account_id uuid REFERENCES public.email_accounts(id) NOT NULL,
     brand_name text NOT NULL,
+    campaign_name text,
     offer_amount numeric(10,2),
     currency text DEFAULT 'USD',
     deadline date,
@@ -46,4 +47,3 @@ CREATE POLICY "Users can manage own brand deals"
 ON public.brand_deals FOR ALL
 USING (auth.uid()::text = user_id);
 
-alter publication supabase_realtime add table brand_deals;

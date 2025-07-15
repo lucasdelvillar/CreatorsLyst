@@ -24,8 +24,10 @@ import { useRouter } from "next/navigation";
 interface BrandDeal {
   id: string;
   brand_name: string;
+  campaign_name: string;
   sender_email: string;
   email_subject: string;
+  email_body: string;
   note_subject: string | null;
   offer_amount: number | null;
   currency: string;
@@ -48,7 +50,9 @@ export default function EditBrandDealDialog({
   const [isPending, startTransition] = useTransition();
   const [formData, setFormData] = useState({
     brand_name: brandDeal.brand_name || "",
-    campaign: brandDeal.email_subject || "",
+    campaign_name: brandDeal.campaign_name || "",
+    email_subject: brandDeal.email_subject || "",
+    email_body: brandDeal.email_body || "",
     offer_amount: brandDeal.offer_amount?.toString() || "",
     currency: brandDeal.currency || "USD",
     status: brandDeal.status || "pending",
@@ -61,9 +65,10 @@ export default function EditBrandDealDialog({
     startTransition(async () => {
       const formDataObj = new FormData();
       formDataObj.append("brand_name", formData.brand_name);
+      formDataObj.append("campaign_name", formData.campaign_name);
       formDataObj.append("sender_email", brandDeal.sender_email); // Keep original sender email
-      formDataObj.append("email_subject", formData.campaign);
-      formDataObj.append("email_body", ""); // Keep empty as requested
+      formDataObj.append("email_subject", formData.email_subject);
+      formDataObj.append("email_body", formData.email_body); // Keep original
       formDataObj.append("offer_amount", formData.offer_amount);
       formDataObj.append("currency", formData.currency);
       formDataObj.append("status", formData.status);
@@ -108,11 +113,13 @@ export default function EditBrandDealDialog({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="campaign">Campaign</Label>
+            <Label htmlFor="campaign_name">Campaign</Label>
             <Input
-              id="campaign"
-              value={formData.campaign}
-              onChange={(e) => handleInputChange("campaign", e.target.value)}
+              id="campaign_name"
+              value={formData.campaignName}
+              onChange={(e) =>
+                handleInputChange("campaign_name", e.target.value)
+              }
               placeholder="Enter campaign name"
               required
             />

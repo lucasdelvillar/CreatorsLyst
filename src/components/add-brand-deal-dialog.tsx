@@ -41,6 +41,7 @@ export function AddBrandDealDialog({
   const [isPending, startTransition] = useTransition();
   const [formData, setFormData] = useState({
     brand_name: "",
+    campaign_name: "",
     sender_email: "",
     email_subject: "",
     note_subject: "",
@@ -57,6 +58,7 @@ export function AddBrandDealDialog({
     startTransition(async () => {
       const formDataObj = new FormData();
       formDataObj.append("brand_name", formData.brand_name);
+      formDataObj.append("campaign_name", formData.campaign_name);
       formDataObj.append("sender_email", formData.sender_email);
       formDataObj.append("email_subject", formData.email_subject);
       formDataObj.append("note_subject", formData.note_subject);
@@ -70,6 +72,7 @@ export function AddBrandDealDialog({
       setOpen(false);
       setFormData({
         brand_name: "",
+        campaign_name: "",
         sender_email: "",
         email_subject: "",
         note_subject: "",
@@ -134,14 +137,14 @@ export function AddBrandDealDialog({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email_subject">Campaign/Subject *</Label>
+            <Label htmlFor="email_subject">Campaign *</Label>
             <Input
               id="email_subject"
-              value={formData.email_subject}
+              value={formData.campaign_name}
               onChange={(e) =>
-                handleInputChange("email_subject", e.target.value)
+                handleInputChange("campaign_name", e.target.value)
               }
-              placeholder="Enter campaign name or email subject"
+              placeholder="Enter campaign name"
               required
               disabled={isPending}
             />

@@ -3,6 +3,8 @@
 import { encodedRedirect } from "@/utils/utils";
 import { redirect } from "next/navigation";
 import { createClient } from "../../supabase/server";
+import { checkRateLimit } from "@/lib/rateLimiter";
+import OpenAI from "openai";
 
 export const signUpAction = async (formData: FormData) => {
   const email = formData.get("email")?.toString();
@@ -84,6 +86,7 @@ export const signInWithGoogleAction = async () => {
   });
 
   if (error) {
+    console.log("error logging in");
     return encodedRedirect("error", "/sign-in", error.message);
   }
 
@@ -327,6 +330,8 @@ export const addEmailAccount = async (formData: FormData) => {
       "Failed to add email account",
     );
   }
+
+  // TODO: add logic to get gmail read permissions
 
   return encodedRedirect(
     "success",
@@ -662,18 +667,10 @@ export const handleGmailCallback = async (code: string, state: string) => {
     console.log("=== SUCCESS ===");
     console.log("Gmail account connected successfully for account:", accountId);
 
-    // Trigger email scanning after successful connection
-    try {
-      await scanEmailsForBrandDeals(accountId);
-    } catch (scanError) {
-      console.log("Warning: Email scanning failed:", scanError);
-      // Don't fail the connection if scanning fails
-    }
-
     return encodedRedirect(
       "success",
       "/dashboard",
-      "Gmail account connected successfully! Scanning for brand deals...",
+      "Gmail account connected successfully!",
     );
   } catch (error) {
     // this will also catch NEXT_REDIRECT which isn't an actual error
@@ -777,7 +774,7 @@ export const scanEmailsForBrandDeals = async (accountId: string) => {
     console.log(`Found ${messages.length} new emails since last scan`);
 
     // Process up to 50 recent emails since we're only getting new ones
-    const messagesToProcess = messages.slice(0, 50);
+    const messagesToProcess = messages.slice(0, 5);
 
     for (const message of messagesToProcess) {
       try {
@@ -815,8 +812,7 @@ export const scanEmailsForBrandDeals = async (accountId: string) => {
         const senderEmail = emailMatch ? emailMatch[1] : from;
 
         // Extract brand name (simple heuristic)
-        const brandName =
-          from.split("<")[0].trim() || senderEmail.split("@")[0];
+        let brandName = from.split("<")[0].trim() || senderEmail.split("@")[0];
 
         // Get email body
         let emailBody = "";
@@ -836,72 +832,59 @@ export const scanEmailsForBrandDeals = async (accountId: string) => {
           }
         }
 
-        // Simple brand deal detection logic
-        const brandKeywords = [
-          "collaboration",
-          "partnership",
-          "sponsor",
-          "brand deal",
-          "campaign",
-          "promote",
-          "marketing",
-          "influencer",
-          "content creator",
-          "ambassador",
-          "review",
-          "feature",
-          "showcase",
-          "compensation",
-        ];
+        // Use AI to analyze the email for brand deal opportunities
+        try {
+          const emailContent = `Subject: ${subject}\n\nFrom: ${from}\n\nBody: ${emailBody}`;
+          const analysis = await analyzeEmailWithAI(emailContent, user.id);
 
-        const text = (subject + " " + emailBody).toLowerCase();
-        const isBrandDeal = brandKeywords.some((keyword) =>
-          text.includes(keyword),
-        );
+          if (!analysis.isBrandDeal) continue;
 
-        if (!isBrandDeal) continue;
+          // Use AI-extracted data
+          const aiExtractedBrandName = analysis.brandName || brandName;
+          let offerAmount = analysis.offerAmount;
+          let currency = analysis.currency || "USD";
+          let deadline = analysis.deadline;
+          let campaignName = analysis.campaignName;
 
-        // Extract offer amount (simple regex)
-        const amountMatch = emailBody.match(/\$([0-9,]+(?:\.[0-9]{2})?)/g);
-        let offerAmount = null;
-        let currency = "USD";
+          // Check if this deal already exists
+          const { data: existingDeal } = await supabase
+            .from("brand_deals")
+            .select("id")
+            .eq("email_id", message.id)
+            .eq("user_id", user.id)
+            .single();
 
-        if (amountMatch && amountMatch.length > 0) {
-          const amount = amountMatch[0].replace(/[$,]/g, "");
-          offerAmount = parseFloat(amount);
-        }
+          if (existingDeal) continue; // Skip if already processed
 
-        // Check if this deal already exists
-        const { data: existingDeal } = await supabase
-          .from("brand_deals")
-          .select("id")
-          .eq("email_id", message.id)
-          .eq("user_id", user.id)
-          .single();
+          // Insert brand deal with AI-enhanced data
+          const { error: insertError } = await supabase
+            .from("brand_deals")
+            .insert({
+              user_id: user.id,
+              email_account_id: accountId,
+              email_id: message.id,
+              brand_name: aiExtractedBrandName,
+              campaign_name: campaignName,
+              sender_email: senderEmail,
+              email_subject: subject,
+              email_body: emailBody.substring(0, 5000), // Limit body length
+              offer_amount: offerAmount,
+              currency: currency,
+              status: "pending",
+              deadline: deadline,
+              note_subject: "",
+            });
 
-        if (existingDeal) continue; // Skip if already processed
-
-        // Insert brand deal
-        const { error: insertError } = await supabase
-          .from("brand_deals")
-          .insert({
-            user_id: user.id,
-            email_account_id: accountId,
-            email_id: message.id,
-            brand_name: brandName,
-            sender_email: senderEmail,
-            email_subject: subject,
-            email_body: emailBody.substring(0, 5000), // Limit body length
-            offer_amount: offerAmount,
-            currency: currency,
-            status: "pending",
-            deadline: null, // Could be extracted with more sophisticated parsing
-          });
-
-        if (insertError) {
-          console.log("Error inserting brand deal:", insertError);
-        } else {
-          activeDealsCount++;
+          if (insertError) {
+            console.log("Error inserting brand deal:", insertError);
+          } else {
+            activeDealsCount++;
+          }
+        } catch (aiError) {
+          console.log(
+            "AI analysis failed, falling back to keyword detection:",
+            aiError,
+          );
         }
       } catch (messageError) {
         console.log("Error processing message:", messageError);
@@ -1029,6 +1012,7 @@ export const updateBrandDeal = async (
   }
 
   const brandName = formData.get("brand_name")?.toString();
+  const campaignName = formData.get("campaign_name")?.toString();
   const senderEmail = formData.get("sender_email")?.toString();
   const emailSubject = formData.get("email_subject")?.toString();
   const emailBody = formData.get("email_body")?.toString();
@@ -1051,6 +1035,7 @@ export const updateBrandDeal = async (
     .from("brand_deals")
     .update({
       brand_name: brandName,
+      campaign_name: campaignName,
       sender_email: senderEmail,
       email_subject: emailSubject,
       email_body: emailBody || "",
@@ -1116,6 +1101,7 @@ export const addBrandDeal = async (formData: FormData) => {
   }
 
   const brandName = formData.get("brand_name")?.toString();
+  const campaignName = formData.get("campaign_name")?.toString();
   const senderEmail = formData.get("sender_email")?.toString();
   const emailSubject = formData.get("email_subject")?.toString();
   const noteSubject = formData.get("note_subject")?.toString();
@@ -1173,6 +1159,7 @@ export const addBrandDeal = async (formData: FormData) => {
       email_account_id: emailAccountId || null,
       email_id: null, // Manual entries don't have email IDs
       brand_name: brandName,
+      campaign_name: campaignName,
       sender_email: senderEmail,
       email_subject: emailSubject,
       note_subject: noteSubject || "",
@@ -1217,3 +1204,75 @@ async function getAccessTokenFromRefreshToken(refreshToken: string) {
   const data = await response.json();
   return data.access_token;
 }
+
+/*******************
+ *  OpenAI functions:
+ ********************/
+
+export const analyzeEmailWithAI = async (
+  emailContent: string,
+  userId: string,
+) => {
+  const tier = await getUserSubscriptionTier(userId);
+  const rateLimitResult = await checkRateLimit(
+    userId,
+    tier as "starter" | "pro" | "studio",
+  );
+
+  if (!rateLimitResult.allowed) {
+    throw new Error(
+      `Rate limit exceeded. Used ${rateLimitResult.count}/${rateLimitResult.limit} daily AI requests.`,
+    );
+  }
+
+  const prompt = `
+  Analyze this email for brand collaboration opportunities. Extract:
+  - Is this a brand deal? (boolean)
+  - Brand name
+  - Offer amount and currency
+  - Key deadlines
+  - Campaign name
+  
+  Return JSON format:
+  {
+    "isBrandDeal": boolean,
+    "brandName": string,
+    "offerAmount": number|null,
+    "currency": string|null,
+    "deadline": string|null,
+    "campaignName": string|null
+  }
+
+  Email Content:
+  ${emailContent.substring(0, 10000)} // Limit to 10k chars
+  `;
+
+  const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
+
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4.1-nano",
+      messages: [
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
+      response_format: { type: "json_object" },
+      max_tokens: 500,
+      temperature: 0.2,
+    });
+
+    const content = response.choices[0]?.message?.content;
+    if (!content) throw new Error("No content in OpenAI response");
+
+    return JSON.parse(content);
+  } catch (error) {
+    console.error("OpenAI API error:", error);
+    throw new Error(
+      `AI analysis failed: ${error instanceof Error ? error.message : "Unknown error"}`,
+    );
+  }
+};
