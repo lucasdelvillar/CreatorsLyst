@@ -13,6 +13,6 @@ export async function GET(request: Request) {
 
   // URL to redirect to after sign in process completes
   const redirectTo = redirect_to || "/dashboard";
-  const baseUrl = "https://hardcore-ptolemy9-9utwh.view-3.tempo-dev.app";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL!;
   return NextResponse.redirect(new URL(redirectTo, baseUrl));
 }

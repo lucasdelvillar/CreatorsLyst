@@ -73,13 +73,13 @@ export const signUpAction = async (formData: FormData) => {
 };
 
 export const signInWithGoogleAction = async () => {
+  console.log("Signing in with google");
   const supabase = await createClient();
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
     options: {
-      redirectTo:
-        "https://hardcore-ptolemy9-9utwh.view-3.tempo-dev.app/auth/callback?redirect_to=/dashboard",
+      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback?redirect_to=/dashboard`,
     },
   });
 
@@ -96,8 +96,7 @@ export const signInWithGitHubAction = async () => {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "github",
     options: {
-      redirectTo:
-        "https://hardcore-ptolemy9-9utwh.view-3.tempo-dev.app/auth/callback?redirect_to=/dashboard",
+      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback?redirect_to=/dashboard`,
     },
   });
 
@@ -114,8 +113,7 @@ export const signInWithFacebookAction = async () => {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "facebook",
     options: {
-      redirectTo:
-        "https://hardcore-ptolemy9-9utwh.view-3.tempo-dev.app/auth/callback?redirect_to=/dashboard",
+      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback?redirect_to=/dashboard`,
     },
   });
 
@@ -132,8 +130,7 @@ export const signInWithInstagramAction = async () => {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "instagram",
     options: {
-      redirectTo:
-        "https://hardcore-ptolemy9-9utwh.view-3.tempo-dev.app/auth/callback?redirect_to=/dashboard",
+      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback?redirect_to=/dashboard`,
     },
   });
 
@@ -479,7 +476,7 @@ export const connectGmailAccount = async (accountId: string) => {
 
   // Generate OAuth URL for Gmail
   const clientId = process.env.GOOGLE_CLIENT_ID;
-  const redirectUri = `${process.env.NEXT_PUBLIC_SITE_URL || "https://hardcore-ptolemy9-9utwh.view-3.tempo-dev.app"}/auth/gmail/callback`; // DEBUG: stuck here since my redirect URI is not authorized. Had to update my google cloud console to allow this link to work
+  const redirectUri = `${process.env.NEXT_PUBLIC_SITE_URL}/auth/gmail/callback`;
   const scope = "https://www.googleapis.com/auth/gmail.readonly";
   const state = accountId; // Pass account ID as state parameter
 
@@ -566,7 +563,7 @@ export const handleGmailCallback = async (code: string, state: string) => {
   }
 
   try {
-    const redirectUri = `${process.env.NEXT_PUBLIC_SITE_URL || "https://hardcore-ptolemy9-9utwh.view-3.tempo-dev.app"}/auth/gmail/callback`;
+    const redirectUri = `${process.env.NEXT_PUBLIC_SITE_URL}/auth/gmail/callback`;
 
     console.log("=== Token Exchange Request ===");
     console.log("Redirect URI:", redirectUri);

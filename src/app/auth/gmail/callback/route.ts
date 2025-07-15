@@ -15,9 +15,7 @@ export async function GET(request: NextRequest) {
     error,
   });
 
-  const SITE_URL =
-    process.env.NEXT_PUBLIC_SITE_URL ||
-    "https://hardcore-ptolemy9-9utwh.view-3.tempo-dev.app";
+  const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL;
 
   // BUG FIX: added error check for when a user cancels when confirming if they want to connect their email account
   if (error === "access_denied") {
