@@ -308,12 +308,16 @@ export const addEmailAccount = async (formData: FormData) => {
     }
   }
 
-  const { error } = await supabase.from("email_accounts").insert({
-    user_id: user.id,
-    email_address: emailAddress,
-    provider: provider,
-    is_connected: false,
-  });
+  const { data, error } = await supabase
+    .from("email_accounts")
+    .insert({
+      user_id: user.id,
+      email_address: emailAddress,
+      provider: provider,
+      is_connected: false,
+    })
+    .select()
+    .single();
 
   if (error) {
     if (error.code === "23505") {
@@ -331,7 +335,10 @@ export const addEmailAccount = async (formData: FormData) => {
     );
   }
 
-  // TODO: add logic to get gmail read permissions
+  // If it's a Gmail account, automatically initiate the connection process
+  if (provider === "gmail" && data) {
+    return await connectGmailAccount(data.id);
+  }
 
   return encodedRedirect(
     "success",

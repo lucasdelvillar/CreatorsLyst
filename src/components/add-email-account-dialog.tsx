@@ -20,7 +20,9 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { addEmailAccount } from "@/app/actions";
+import { connectGmailAccount } from "@/app/actions";
 import { Mail } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface AddEmailAccountDialogProps {
   children: React.ReactNode;
@@ -31,10 +33,13 @@ export function AddEmailAccountDialog({
 }: AddEmailAccountDialogProps) {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [provider, setProvider] = useState("");
+  const router = useRouter();
 
   const handleSubmit = async (formData: FormData) => {
     setIsLoading(true);
     try {
+      // Add the email account (Gmail accounts will automatically redirect to OAuth)
       await addEmailAccount(formData);
       setOpen(false);
     } catch (error) {
@@ -74,7 +79,12 @@ export function AddEmailAccountDialog({
 
           <div className="space-y-2">
             <Label htmlFor="provider">Email Provider</Label>
-            <Select name="provider" required disabled={isLoading}>
+            <Select
+              name="provider"
+              required
+              disabled={isLoading}
+              onValueChange={setProvider}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Select your email provider" />
               </SelectTrigger>
@@ -90,10 +100,27 @@ export function AddEmailAccountDialog({
               What happens next?
             </h4>
             <ul className="text-sm text-blue-800 space-y-1">
-              <li>• We'll securely connect to your email account</li>
-              <li>• Our AI will scan for brand collaboration emails</li>
-              <li>• Deals will appear in your dashboard automatically</li>
-              <li>• You can respond directly from the platform</li>
+              {provider === "gmail" ? (
+                <>
+                  <li>• We'll add your Gmail account to the system</li>
+                  <li>• You'll be redirected to authorize Gmail access</li>
+                  <li>• Our AI will scan for brand collaboration emails</li>
+                  <li>• Deals will appear in your dashboard automatically</li>
+                </>
+              ) : provider === "outlook" ? (
+                <>
+                  <li>• We'll add your Outlook account to the system</li>
+                  <li>• Outlook integration is coming soon</li>
+                  <li>• You'll be notified when it's available</li>
+                </>
+              ) : (
+                <>
+                  <li>• We'll securely connect to your email account</li>
+                  <li>• Our AI will scan for brand collaboration emails</li>
+                  <li>• Deals will appear in your dashboard automatically</li>
+                  <li>• You can respond directly from the platform</li>
+                </>
+              )}
             </ul>
           </div>
 
@@ -107,7 +134,11 @@ export function AddEmailAccountDialog({
               Cancel
             </Button>
             <Button type="submit" disabled={isLoading}>
-              {isLoading ? "Adding..." : "Add Account"}
+              {isLoading
+                ? "Adding..."
+                : provider === "gmail"
+                  ? "Add & Connect Gmail"
+                  : "Add Account"}
             </Button>
           </div>
         </form>
